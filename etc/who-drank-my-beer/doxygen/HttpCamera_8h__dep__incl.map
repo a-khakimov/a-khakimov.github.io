@@ -1,0 +1,8 @@
+<map id="WhoDrankMyBeerBot/HttpCamera.h" name="WhoDrankMyBeerBot/HttpCamera.h">
+<area shape="rect" id="node2" href="$HttpCamera_8cpp.html" title="Класс предоставляет метод для получения изображений от HTTP&#45;сервера. " alt="" coords="5,87,255,114"/>
+<area shape="rect" id="node3" href="$ImgDiffFinder_8h.html" title="Класс предназначенный для определения наличия разности изображений " alt="" coords="279,80,475,121"/>
+<area shape="rect" id="node6" href="$main_8cpp.html" title="Все начинается тут " alt="" coords="412,266,619,293"/>
+<area shape="rect" id="node4" href="$ImgDiffFinder_8cpp.html" title="Класс предназначенный для определения наличия разности изображений " alt="" coords="55,169,251,211"/>
+<area shape="rect" id="node5" href="$WatcherBot_8h.html" title="Класс, содержащий логику для взаимодействия с пользователями. " alt="" coords="275,169,478,211"/>
+<area shape="rect" id="node7" href="$WatcherBot_8cpp.html" title="Класс, содержащий логику для взаимодействия с пользователями. " alt="" coords="185,259,387,300"/>
+</map>

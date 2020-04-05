@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>WhoDrankMyBeer: Титульная страница</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">WhoDrankMyBeer
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Создано системой Doxygen 1.8.13 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Поиск');
+  $(document).ready(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">WhoDrankMyBeer Документация</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p><a href="https://hub.docker.com/r/ainr/who-drank-my-beer"></a> </p>
+<h1>Who drank my beer</h1>
+<h2>Описание</h2>
+<p><em>TODO</em></p>
+<h3>Конфигурирование</h3>
+<p>Для конфигурирования используется json-файл</p>
+<div class="fragment"><div class="line">{</div><div class="line">    &quot;token&quot; : &quot;&quot;,</div><div class="line">    &quot;proxy_host&quot; : &quot;socks5://localhost:9050&quot;,</div><div class="line">    &quot;http_cameras&quot;: [</div><div class="line">        { &quot;host&quot; : &quot;192.168.0.2&quot;, &quot;port&quot; : 1234, &quot;path&quot; : &quot;/PiCamera.png&quot;     },</div><div class="line">        { &quot;host&quot; : &quot;192.168.0.5&quot;, &quot;port&quot; : 8890, &quot;path&quot; : &quot;/path/to/img.png&quot;  },</div><div class="line">    ],</div><div class="line">    &quot;chats&quot; : [</div><div class="line">        123456789</div><div class="line">    ]</div><div class="line">}</div></div><!-- fragment --><ul>
+<li><em>token</em> - для авторизации бота в telegram</li>
+<li><em>chats</em> - id-пользователей (чатов), которых будет уведомлять бот</li>
+<li><em>proxy_host</em> - адрес прокси</li>
+<li><em>http_cameras</em> - список</li>
+</ul>
+<h2>Зависимости</h2>
+<ul>
+<li><a href="https://github.com/SergiusTheBest/plog">plog</a> - логгирование</li>
+<li><a href="https://github.com/opencv/opencv">opencv</a> - используется для обработки и сравнения изображений</li>
+<li><a href="https://github.com/reo7sp/tgbot-cpp">tgbot-cpp</a> - библиотека для создания чат-ботов в телеграм</li>
+<li><a href="https://github.com/yhirose/cpp-httplib">cpp-httplib</a> - для выполнения http-запросов серверу изображений</li>
+<li><a href="https://github.com/jarro2783/cxxopts.git">cxxopts</a> - используется для парсинга аргументов коммандной строки</li>
+<li><a href="https://github.com/nlohmann/json.git">json</a> - для работы с json-файлами</li>
+</ul>
+<h3>Сборка</h3>
+<p>Перед сборкой необходимо установить вышеперечисленные зависимости. Склонировать проект и вытянуть модули</p>
+<div class="fragment"><div class="line">git clone https://github.com/a-khakimov/WhoDrankMyBeer.git</div><div class="line">cd WhoDrankMyBeer</div><div class="line">git submodule update --recursive --init</div></div><!-- fragment --><h4>qbs</h4>
+<div class="fragment"><div class="line">cd WhoDrankMyBeerBot</div><div class="line">qbs build</div></div><!-- fragment --><h4>cmake</h4>
+<div class="fragment"><div class="line">cd WhoDrankMyBeerBot</div><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ..</div><div class="line">make</div></div><!-- fragment --><h3>Запуск бота</h3>
+<p>Список доступных команд можно получить отправив команду `'/help'` </p>
+</div></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Создано системой &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.13
+</small></address>
+</body>
+</html>
