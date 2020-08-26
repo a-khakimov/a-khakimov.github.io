@@ -12,7 +12,7 @@
 ### Контакты
 
 * [hak.ain@yandex.ru](hak.ain@yandex.ru)
-* [t.me/tech_linked](https://t.me/tech_linked)
+* [t.me/tech_linked](https://t.me/ainr_c)
 * [vk.com/hakain](https://vk.com/hakain)
 * [github](https://github.com/a-khakimov/)
 
