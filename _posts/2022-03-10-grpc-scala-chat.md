@@ -298,3 +298,5 @@ $ sbt "runMain org.github.ainr.chat.client.ChatClientApp Username"
 ## Исходники
 
 Код проекта можно посмотреть на гитхабе - [https://github.com/a-khakimov/simple-fs2-grpc-chat](https://github.com/a-khakimov/simple-fs2-grpc-chat).
+
+{% include embed/youtube.html id='Y0tQIVXPwh0' %}

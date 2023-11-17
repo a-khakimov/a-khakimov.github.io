@@ -241,3 +241,5 @@ $ objdump -t libsomecode.so | grep print_split
 ```
 
 Примерно те же действия вы будете делать и под windows и под мак, будут немного другие компиляторы, но идея одна.
+
+{% include embed/youtube.html id='Jcr9jhAysIc' %}
