@@ -9,7 +9,7 @@
   <script>
     $(document).ready(function () {
 
-      fetch('http://127.0.0.1:5555/categories?chatId=174861972')
+      fetch('https://127.0.0.1:5555/categories?chatId=174861972')
         .then(response => response.json())
         .then(userCategories => {
           $.each(userCategories, function (key, str) {
@@ -17,7 +17,7 @@
           });
         })
         .catch(error => console.error(error));
-        
+
       function collectData() {
         var category = $("#category").val();
         if (category === categories[categories.length-1]) {
@@ -29,7 +29,7 @@
           description: $("#text").val(),
           date: $("#date_input").val()
         };
-        
+
         Object.keys(data).forEach(
           (key) =>
             (data[key] =
@@ -56,7 +56,7 @@
 
         return [year, month, day].join("-");
       }
-      
+
       $("#date_input").val(formatDate(new Date()));
 
       $("#category").on("change", collectData);

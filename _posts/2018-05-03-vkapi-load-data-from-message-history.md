@@ -68,7 +68,7 @@ def openAllDialogsAndGetGeo(vkapi, max_count=200, cur_offset=0):
         time.sleep(0.5) # min time should be longer 0.3 s
 ```
 
-After uploading all the geo-positions, I spread them on the map [OpenStreetMap](http://openstreetmap.ru).
+After uploading all the geo-positions, I spread them on the map [OpenStreetMap](https://openstreetmap.ru).
 
 ![MAP1](assets/img/0001/1.jpg)
 

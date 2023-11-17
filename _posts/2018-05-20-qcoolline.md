@@ -98,7 +98,7 @@ QVector<QPoint> LeeAlgorythm::GetPath(const QPoint &endPoint) {
 
 ## Graphic part
 
-I used [QGraphicsScene](http://doc.qt.io/qt-5/qgraphicsscene.html) for graphics. It allows you to draw primitive things like lines and points, place widgets on the scene, and work with incoming events. At the beginning of the scene drawn obstacles in the form of random rectangles. Obstacles can be re-generated. Well, then the user is to specify two points and get the result. I agree that the following code does not look very nice, but it does the following:
+I used [QGraphicsScene](https://doc.qt.io/qt-5/qgraphicsscene.html) for graphics. It allows you to draw primitive things like lines and points, place widgets on the scene, and work with incoming events. At the beginning of the scene drawn obstacles in the form of random rectangles. Obstacles can be re-generated. Well, then the user is to specify two points and get the result. I agree that the following code does not look very nice, but it does the following:
 
 * when you click the mouse to select a point we just remembered the position
 * and when you click again in another place, will be called the method **CustomLee**, which calculates the shortest distance and then in the **for** cycle the line is drawn in the scene by the **scene->addEllipse** method.

@@ -17,7 +17,7 @@ When developing software for STM32 microcontrollers, I usually include the follo
 
 The whole process of installation and start-up are described below.
 
-<img src="/assets/img/stm32-how-start/stm32.jpg" width="500">
+![](/assets/img/stm32-how-start/stm32.jpg){: .dark .w-75 .shadow .rounded-10 w='500' }
 
 ----------------
 
@@ -60,11 +60,11 @@ source .bashrc
 
 After configuring the peripherals and clock frequencies, need to generate a project. Also need to configure of the generation of the project. I set the generation **Makefile** and put a tick to generate *.c and *.h files for each peripheral.
 
-<img src="/assets/img/stm32-how-start/proj-settings.png" width="550">
+![](/assets/img/stm32-how-start/proj-settings.png){: .dark .w-75 .shadow .rounded-10 w='550' }
 
 You may have to wait for the required libraries to be downloaded.
 
-<img src="/assets/img/stm32-how-start/load.gif" width="350">
+![](/assets/img/stm32-how-start/load.gif){: .dark .w-75 .shadow .rounded-10 w='350' }
 
 ----------------
 

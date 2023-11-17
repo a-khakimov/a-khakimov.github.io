@@ -12,7 +12,7 @@ order: 4
 
 <p align="left">
     <a href="https://www.codewars.com/users/ainr">
-    	<img src="https://www.codewars.com/users/ainr/badges/small" />
+    	<img alt="small" src="https://www.codewars.com/users/ainr/badges/small" />
 	</a>
 </p>
 

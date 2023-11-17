@@ -14,7 +14,7 @@ This is rather not a post, but a small cheat sheet required to work with **Postg
 
 ## PostgreSQL installation
 
-I work on Linux [Manjaro](http://manjaro.org/) and the installation of **PostgreSQL** was reduced to what I opened the package Manager, found **PostgreSQL** in the search engine and installed. In other distributions, you can install in a similar way.
+I work on Linux [Manjaro](https://manjaro.org/) and the installation of **PostgreSQL** was reduced to what I opened the package Manager, found **PostgreSQL** in the search engine and installed. In other distributions, you can install in a similar way.
 
 ----------------
 
@@ -289,7 +289,7 @@ UPDATE 1
 
 ### As their friends?
 
-For work with **PostgreSQL** from **Python** I found the library [psycopg2](http://initd.org/psycopg/docs/install.html). 
+For work with **PostgreSQL** from **Python** I found the library [psycopg2](https://initd.org/psycopg/docs/install.html). 
 
 First of all, you need to import the library.
 
@@ -390,7 +390,7 @@ As far as I know, the application of [ODB](https://www.codesynthesis.com/product
 
 #### libpqxx
 
-[libpqxx](http://pqxx.org/development/libpqxx/) - an [open source library](https://github.com/jtv/libpqxx) for working with PostgreSQL that provides methods for executing SQL queries.
+[libpqxx](https://pqxx.org/development/libpqxx/) - an [open source library](https://github.com/jtv/libpqxx) for working with PostgreSQL that provides methods for executing SQL queries.
 
 It is installed simply:
 
@@ -516,7 +516,7 @@ This should be enough for the job. All the queries necessary for working with th
 
 #### QtSql
 
-Qt provides its own library for working with databases, which is called [QtSql](http://doc.qt.io/qt-5/sql-programming.html).
+Qt provides its own library for working with databases, which is called [QtSql](https://doc.qt.io/qt-5/sql-programming.html).
 
 To work with it, first of all, you need to add a line to the **pro** file:
 

@@ -12,15 +12,15 @@ tags: [c/c++, qt, qtcarts, algorythms, gsl, practice]
 
 Суть задания заключается в следующем - написать программу, которая по изображению снимков со сканера вен ладоней определяет приложена ли ладонь к сканеру.
 Исходные данные - несколько снимков с заранее известным результатом. Нужно скормить их программе, а программа, в свою очередь, должна сказать - приложена ладонь или нет.
-<img src="/assets/img/palmdetector/imgslist.png" width="600">
+![](/assets/img/palmdetector/imgslist.png){: .dark .w-75 .shadow .rounded-10 w='600' }
 
 ### Результат
 
 Программа с графическим интерфейсом с возможностью выбора изображения из списка. После выбора изображение анализируется и после анализа выдается результат в виде надписи **Good** или **Bad**.
 
-<img src="/assets/img/palmdetector/palmdetector_good.png" width="600">
+![](/assets/img/palmdetector/palmdetector_good.png){: .dark .w-75 .shadow .rounded-10 w='600' }
 
-<img src="/assets/img/palmdetector/palmdetector_bad.png" width="600">
+![](/assets/img/palmdetector/palmdetector_bad.png){: .dark .w-75 .shadow .rounded-10 w='600' }
 
 ### Алгоритм
 
@@ -40,11 +40,11 @@ public:
 
 Внутри этого класса решил условно разделить изображение на 4 части для каждого источника света. И для каждого изображения расчитать среднюю яркость относительно осей **Х** и **У**. Наглядно это продемонстрировано на изображении ниже.
 
-<img src="/assets/img/palmdetector/plot.gif" width="500">
+![](/assets/img/palmdetector/plot.gif){: .dark .w-75 .shadow .rounded-10 w='500' }
 
 В результате получим восемь графиков со средним уровнем яркости.
 
-<img src="/assets/img/palmdetector/algorythm.gif" width="500">
+![](/assets/img/palmdetector/algorythm.gif){: .dark .w-75 .shadow .rounded-10 w='500' }
 
 Далее нужно произвести анализ этих графиков. Я решил использовать функцию корреляции сравнив полученные графики с некоторым "идеальным" графиком. Идеальный график в данном случае это просто прямоугольник, который я получаю следующим способом:
 
@@ -66,7 +66,7 @@ std::vector<int> ImageAnalyser::prepare_ideal_array(const std::vector<int>& arra
 }
 ```
 
-Для сравнения сравнения графиков и, соответственно, получения значения корреляции я использовал функцию **gsl_stats_correlation**, реализацию которого честно украл из [GNU Scientific Library](https://www.gnu.org/software/gsl/doc/html/statistics.html).
+Для сравнения графиков и, соответственно, получения значения корреляции я использовал функцию **gsl_stats_correlation**, реализацию которого честно украл из [GNU Scientific Library](https://www.gnu.org/software/gsl/doc/html/statistics.html).
 
 ```cpp
 double ImageAnalyser::gsl_stats_correlation(const std::vector<int>& data)
