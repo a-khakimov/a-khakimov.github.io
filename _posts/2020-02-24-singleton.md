@@ -3,7 +3,7 @@ layout: post
 title: Как реализовать singleton?
 date: 2020-02-24 00:01:30 +0000
 categories: [C/C++]
-tags: [c/c++, singleton, pattern, solid]
+tags: [C/C++, Patterns]
 seo:
   date_modified: 2020-02-25 23:06:38 +0500
 ---

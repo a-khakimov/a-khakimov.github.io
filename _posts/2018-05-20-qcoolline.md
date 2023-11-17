@@ -1,9 +1,9 @@
 ---
 layout: post
-title: 'QCoolLine : bfs algorythm'
+title: 'QCoolLine: BFS algorithm'
 date: 2018-05-20 11:42:00 +0000
-categories: [Algorythms, Qt, C/C++]
-tags: [qt, algorythm, bfs, c/c++, алгоритмы]
+categories: [Algorithms]
+tags: [Qt, Algorithm, BFS, C/C++]
 ---
 
 One day it happened that I had a task to write a small program using [Qt Creator](https://www.qt.io/), which would build the shortest path on the stage between two points. In general, this program is useless and it is nowhere to apply, but for me was useful experience of writing this program. To find the shortest path I decided to use the [wide search](https://en.wikipedia.org/wiki/Breadth-first_search) algorithm.

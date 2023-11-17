@@ -3,7 +3,7 @@ layout: post
 title: Пишем простой чат с консольным интерфейсом используя трубно-ориентированное программирование с котами
 date: 2022-03-10 00:23:30 +0000
 categories: [Scala]
-tags: [gRPC, scala, fs2]
+tags: [gRPC, Scala, FS2]
 ---
 
 ![](assets/img/grpc.scala.chat.gif){: w="700" : .normal : .shadow }

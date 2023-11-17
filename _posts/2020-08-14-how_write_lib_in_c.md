@@ -3,7 +3,7 @@ layout: post
 title: Как написать свою библиотеку на Си
 date: 2020-08-14 00:23:30 +0000
 categories: [C/C++]
-tags: [c/c++, linux, library]
+tags: [C/C++, Linux]
 ---
 
 ![img-description](https://source.unsplash.com/b1jZUrEUM3g){: w="400" .shadow }

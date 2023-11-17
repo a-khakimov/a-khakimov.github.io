@@ -3,7 +3,7 @@ layout: post
 title: Порционный запуск List[Future]
 date: 2021-02-23 00:23:30 +0000
 categories: [Scala]
-tags: [scala, future]
+tags: [Scala, Future]
 ---
 
 ![img-description](https://source.unsplash.com/hVcG4UdxNhM){: w="400" .shadow }

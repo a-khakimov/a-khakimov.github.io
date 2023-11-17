@@ -2,8 +2,8 @@
 layout: post
 title: "STM32: How to start in Linux"
 date: 2018-05-26 00:01:30 +0000
-categories: [STM32]
-tags: [microcontroller, stm32, stlink, stm32cubemx]
+categories: [Microcontrollers]
+tags: [STM32, ST-Link, STM32Cubemx]
 ---
 
 ----------------

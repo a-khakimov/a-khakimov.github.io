@@ -3,9 +3,7 @@ layout: post
 title: Играемся с std:filesystem [C++17]
 date: 2019-02-02 00:01:30 +0000
 categories: [C/C++]
-tags: [c, c++, filesystem, experimental, c++17]
-seo:
-  date_modified: 2020-01-28 23:54:15 +0500
+tags: [Libraries]
 ---
 
 В C++17 добавлено новое пространство имен [std::filesystem](https://en.cppreference.com/w/cpp/experimental/fs). На мой взгляд он предоставляет удобный интерфейс для работы с файловой системой. Тогда как раньше приходилось складывать строки и вызывать си функции для манипуляций атрибутами файлов.

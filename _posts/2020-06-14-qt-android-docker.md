@@ -3,7 +3,7 @@ layout: post
 title: Сборка Android/Qt приложений с помощью Docker-контейнеров
 date: 2020-05-25 00:23:30 +0000
 categories: [Qt, Android, Docker]
-tags: [qt, android, docker]
+tags: [Qt, Android, Docker]
 ---
 
 ![](https://cdn.shopify.com/s/files/1/0099/4220/4513/products/QtAndroidTools_logo_256x.png)

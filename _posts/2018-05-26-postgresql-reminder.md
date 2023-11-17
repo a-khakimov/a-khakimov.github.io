@@ -2,10 +2,8 @@
 layout: post
 title: 'PostgreSQL: How to use it?'
 date: 2018-06-02 00:01:30 +0000
-categories: [Postgresql, C/C++, Qt]
-tags: [python, postgresql, qt, database, базы данных]
-seo:
-  date_modified: 2020-01-28 23:54:15 +0500
+categories: [PostgreSQL, C/C++, Qt]
+tags: [Python, PostgreSQL, Qt, Database]
 ---
 
 This is rather not a post, but a small cheat sheet required to work with **PostgreSQL** operations. Impossible to keep all the information in your head, so you need to do for yourself handbooks to be able to access them at any time.

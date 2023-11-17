@@ -3,7 +3,7 @@ layout: post
 title: Пару слов об ODB ORM 
 date: 2020-06-25 00:23:30 +0000
 categories: [Qt, Postgresql, C/C++]
-tags: [orm, odb, qt, postgresql, database, c/c++]
+tags: [Qt, PostgreSQL, Database, C/C++]
 ---
 
 Некоторое время назад встретил на своем пути замечательную ORM-библиотеку [ODB](https://www.codesynthesis.com/products/odb/). Приглянулась она мне довольно подробными [примерами](https://www.codesynthesis.com/products/odb/examples.xhtml) и [документацией](https://www.codesynthesis.com/products/odb/doc.xhtml). А так же мое почтение разработчикам за максимально наглядное изображение, демонстрирующее механизм работы с библиотекой.

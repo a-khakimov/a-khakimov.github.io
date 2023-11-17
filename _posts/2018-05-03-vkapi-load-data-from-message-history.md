@@ -3,7 +3,7 @@ layout: post
 title: 'vkapi: load data from message history'
 date: 2018-05-03 00:30:00 +0000
 categories: [Python]
-tags: [python, vkapi]
+tags: [ VK-Api ]
 ---
 
 ## Problem

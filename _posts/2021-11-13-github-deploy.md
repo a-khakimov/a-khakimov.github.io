@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Деплой приложения из github на виртуальный хостинг
+title: Деплой приложения из Github на виртуальный хостинг
 date: 2021-11-13 00:23:30 +0000
 categories: [CI/CD]
-tags: [github, ci/cd]
+tags: [Github, CI/CD]
 ---
 
 ![img-description](https://source.unsplash.com/VNOFgRMyons){: w="400" .shadow }

@@ -3,9 +3,7 @@ layout: post
 title: Поднимаем телеграм бота через прокси
 date: 2019-12-25 00:01:30 +0000
 categories: [Telegram]
-tags: [telegram, proxy, bot, tor, linux]
-seo:
-  date_modified: 2020-02-05 09:54:07 +0500
+tags: [Telegram]
 ---
 
 ## Проблема
