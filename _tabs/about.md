@@ -4,5 +4,48 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-> Add Markdown syntax content to file `_tabs/about.md`{: .filepath } and it will show up on this page.
+> В этом блоге я пытаюсь писать небольшие гайды и делюсь опытом.
 {: .prompt-tip }
+
+
+---
+
+<p align="left">
+    <a href="https://www.codewars.com/users/ainr">
+    	<img src="https://www.codewars.com/users/ainr/badges/small" />
+	</a>
+</p>
+
+---
+
+## Контакты
+
+* hak.ain@yandex.ru
+* [t.me/ainr_c](https://t.me/ainr_c)
+* [vk.com/hakain](https://vk.com/hakain)
+* [github.com/a-khakimov](https://github.com/a-khakimov/)
+
+
+--- 
+
+## Увлекаюсь фотографией
+
+![](https://source.unsplash.com/VNOFgRMyons){: w="400" .shadow }
+
+
+Основное оборудование:
+* Фотоаппарат **Sony A6400**
+* Объектив **Sony E 1.8/35mm**
+* Теле-объектив **Sony E 4.5-6.3/70-350mm**
+
+Мои фотографии можно найти:
+* Unsplash - [unsplash.com/@ainr](https://unsplash.com/@ainr)
+* Telegram - [t.me/ainr_photos](https://t.me/ainr_photos)
+
+
+---
+
+## Довольно активно катаюсь на велосипеде
+
+Мой профиль в Strava - [ww.strava.com/athletes/55372869](https://www.strava.com/athletes/55372869)
+

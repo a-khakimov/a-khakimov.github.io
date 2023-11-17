@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+  </head>
+  <body>
+    <div>
+      <form>
+        <select id="brand" name="brand"></select>
+        <select id="model" name="model" disabled></select>
+        <select id="year" name="year"></select>
+
+        <div id="transmission" class="button-group">
+          <button type="button" class="button button-pressed" id="any">
+            Любая
+          </button>
+          <button type="button" class="button button-default" id="manual">
+            Механика
+          </button>
+          <button type="button" class="button button-default" id="automatic">
+            Автомат
+          </button>
+          <button type="button" class="button button-default" id="variator">
+            Вариатор
+          </button>
+        </div>
+
+        <div id="steering" class="button-group">
+          <button type="button" class="button button-pressed" id="any">
+            Любой
+          </button>
+          <button type="button" class="button button-default" id="left">
+            Левый руль
+          </button>
+          <button type="button" class="button button-default" id="right">
+            Правый руль
+          </button>
+        </div>
+
+        <label for="mileage">Максимальный пробег в км.</label>
+        <input
+          type="number"
+          id="mileage-max"
+          name="mileage-max"
+          placeholder="км."
+        />
+
+        <label for="price">Цена в $</label>
+        <div class="input-group">
+          <input
+            type="number"
+            id="price-min"
+            name="price-min"
+            class="input"
+            placeholder="От"
+          />
+          <input
+            type="number"
+            id="price-max"
+            name="price-max"
+            class="input"
+            placeholder="До"
+          />
+        </div>
+
+        <label for="city">Город</label>
+        <select id="city" name="city"></select>
+      </form>
+    </div>
+  </body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../js/dropDowns.js"></script>
+  <script>
+    const mainButton = window.Telegram.WebApp.MainButton;
+    mainButton.text = "Найти";
+    mainButton.enable();
+    mainButton.show();
+    mainButton.onClick(function () {
+      const data = {
+        brand: $("#brand").val(),
+        model: $("#model").val(),
+        year: $("#year").val(),
+        transmission: $("#transmission").find(".button-pressed").attr("id"),
+        steering: $("#steering").find(".button-pressed").attr("id"),
+        mileage: parseInt($("#mileage-max").val(), 10),
+        priceMin: parseInt($("#price-min").val(), 10),
+        priceMax: parseInt($("#price-max").val(), 10),
+        city: $("#city").val(),
+      };
+      Object.keys(data).forEach(
+        (key) => (data[key] = data[key] === "any" ? null : data[key])
+      );
+      window.Telegram.WebApp.sendData(JSON.stringify(data));
+    });
+  </script>
+</html>
