@@ -38,9 +38,7 @@ order: 4
 * Объектив **Sony E 1.8/35mm**
 * Теле-объектив **Sony E 4.5-6.3/70-350mm**
 
-Мои фотографии можно найти:
-* Unsplash - [unsplash.com/@ainr](https://unsplash.com/@ainr)
-* Telegram - [t.me/ainr_photos](https://t.me/ainr_photos)
+Мои фотографии можно найти в [unsplash.com/@ainr](https://unsplash.com/@ainr)
 
 
 ---
