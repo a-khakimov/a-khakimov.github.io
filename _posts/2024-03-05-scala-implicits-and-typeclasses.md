@@ -389,29 +389,29 @@ trait Area[A] {
 }
 
 // сущности, отвечающие за реализацию
-class CircleArea extends Area[Circle] {
-  override def area(circle: Circle) : Double = math.Pi * math.pow(circle.radius, 2)
+object CircleArea extends Area[Circle] {
+  override def area(circle: Circle): Double = math.Pi * math.pow(circle.radius, 2)
 }
 
-class RectangleArea extends Area[Rectangle] {
+object RectangleArea extends Area[Rectangle] {
   override def area(rectangle: Rectangle): Double = rectangle.width * rectangle.length
 }
 
 // Обобщенная функция
 def areaOf[A](shape: A, area: Area[A]): Double = area.area(shape)
 
-areaOf(Circle(42), new CircleArea)
-areaOf(Rectangle(12, 15), new RectangleArea)
+areaOf(Circle(11), CircleArea)
+areaOf(Rectangle(12, 15), RectangleArea)
 ```
 
 Мы можем уменьшить количество кода, если создадим неявные инстансы тайпкласса `Area` для типов `Circle` и `Rectangle`, а так же если будем пробрасывать эти инстансы в функцию `areaOf` неявно.
 
 ```scala
-implicit val circleArea = new Area[Circle] {
-  override def area(circle: Circle) : Double = math.Pi * math.pow(circle.radius, 2)
+implicit val circleArea: Area[Circle] = new Area[Circle] {
+  override def area(circle: Circle): Double = math.Pi * math.pow(circle.radius, 2)
 }
 
-implicit val rectangleArea = new Area[Rectangle] {
+implicit val rectangleArea: Area[Rectangle] = new Area[Rectangle] {
   override def area(rectangle: Rectangle): Double = rectangle.width * rectangle.length
 }
 
@@ -458,7 +458,7 @@ trait TypeClass[A] {
 
 ```scala
 object TypeClassInstances {
-  implicit val intInstance = new TypeClass[Int] {
+  implicit val intInstance: TypeClass[Int] = new TypeClass[Int] {
     def method(value: Int): Unit = ???
   }
 }
@@ -486,7 +486,7 @@ object SomeApp {
 }
 ```
 
-Так же тайпклассы можно прокидывать через тайп-параметры.
+Так же тайпклассы можно прокидывать через [контекст баунды](https://docs.scala-lang.org/scala3/book/ca-context-bounds.html) тайп-параметров.
 
 ```scala
 object SomeApp {
@@ -550,13 +550,13 @@ object Show {
   
 // Инстансы тайпкласса для Int и String
 object ShowInstances {  
-  implicit val showInt = new Show[Int] {  
-    def show(value: Int): String = value.toString  
-  }  
+  implicit val showInt: Show[Int] = new Show[Int] {
+    def show(value: Int): String = value.toString
+  }
 
-  implicit val showString = new Show[String] {  
-    def show(value: String): String = value  
-  }  
+  implicit val showString: Show[String] = new Show[String] {
+    def show(value: String): String = value
+  }
 }  
   
 // Синтаксис
@@ -590,7 +590,7 @@ case class User(name: String, age: Int)
 
 object User {
   
-  implicit val showUser = new Show[User] {
+  implicit val showUser: Show[User] = new Show[User] {
     def show(user: User): String = s"User(name = ${user.name}, age = ${user.age})"
   }
 }
@@ -626,11 +626,11 @@ object Eq {
   
 // Инстансы тайпкласса для Int и String
 object EqInstances {
-  implicit val eqInt = new Eq[Int] {
+  implicit val eqInt: Eq[Int] = new Eq[Int] {
     def eqv(x: Int, y: Int): Boolean = x == y
   }
 
-  implicit val eqString = new Eq[String] {
+  implicit val eqString: Eq[String] = new Eq[String] {
     def eqv(x: String, y: String): Boolean = x == y
   }
 }
@@ -638,9 +638,9 @@ object EqInstances {
 // Синтаксис
 object EqSyntax {
   implicit class EqOps[A](private val x: A) extends AnyVal {
-    def eqv(y: A)(implicit ev: Eq[A]): Unit = ev.eqv(x, y)
-    def ===(y: A)(implicit ev: Eq[A]): Unit = ev.eqv(x, y)
-    def =!=(y: A)(implicit ev: Eq[A]): Unit = !ev.eqv(x, y)
+    def eqv(y: A)(implicit ev: Eq[A]): Boolean = ev.eqv(x, y)
+    def ===(y: A)(implicit ev: Eq[A]): Boolean = ev.eqv(x, y)
+    def =!=(y: A)(implicit ev: Eq[A]): Boolean = !ev.eqv(x, y)
   }
 }
 ```
@@ -655,7 +655,11 @@ Eq[Int].eqv(2 + 2, 4)   // result: true
   
 "Hello" === "world"     // result: false  
 "Hello" =!= "world"     // result: true  
-  
+```
+
+Попытка сравнить значения с разными типами будет жестко пресечена компилятором.
+
+```scala
 "Hello" === 42  
 /*  
   [error]  fff.scala:202:15: type mismatch;  
@@ -673,7 +677,7 @@ Eq[Int].eqv(2 + 2, 4)   // result: true
 case class User(name: String, age: Int)  
   
 object User {
-  implicit val eqUser = new Eq[User] {  
+  implicit val eqUser: Eq[User] = new Eq[User] {  
     def eqv(x: User, y: User): Boolean = x.name === y.name && x.age === y.age
   }
 }
