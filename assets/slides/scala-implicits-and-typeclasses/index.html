@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title></title>
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/serif.css" id="theme" />
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+	<link rel="stylesheet" href="css/layout.css" />
+	<link rel="stylesheet" href="plugin/customcontrols/style.css">
+
+	<link rel="stylesheet" href="plugin/reveal-pointer/pointer.css" />
+
+
+    <script defer src="dist/fontawesome/all.min.js"></script>
+
+	<script type="text/javascript">
+		var forgetPop = true;
+		function onPopState(event) {
+			if(forgetPop){
+				forgetPop = false;
+			} else {
+				parent.postMessage(event.target.location.href, "app://obsidian.md");
+			}
+        }
+		window.onpopstate = onPopState;
+		window.onmessage = event => {
+			if(event.data == "reload"){
+				window.document.location.reload();
+			}
+			forgetPop = true;
+		}
+
+		function fitElements(){
+			const itemsToFit = document.getElementsByClassName('fitText');
+			for (const item in itemsToFit) {
+				if (Object.hasOwnProperty.call(itemsToFit, item)) {
+					var element = itemsToFit[item];
+					fitElement(element,1, 1000);
+					element.classList.remove('fitText');
+				}
+			}
+		}
+
+		function fitElement(element, start, end){
+
+			let size = (end + start) / 2;
+			element.style.fontSize = `${size}px`;
+
+			if(Math.abs(start - end) < 1){
+				while(element.scrollHeight > element.offsetHeight){
+					size--;
+					element.style.fontSize = `${size}px`;
+				}
+				return;
+			}
+
+			if(element.scrollHeight > element.offsetHeight){
+				fitElement(element, start, size);
+			} else {
+				fitElement(element, size, end);
+			}		
+		}
+
+
+		document.onreadystatechange = () => {
+			fitElements();
+			if (document.readyState === 'complete') {
+				if (window.location.href.indexOf("?export") != -1){
+					parent.postMessage(event.target.location.href, "app://obsidian.md");
+				}
+				if (window.location.href.indexOf("print-pdf") != -1){
+					let stateCheck = setInterval(() => {
+						clearInterval(stateCheck);
+						window.print();
+					}, 250);
+				}
+			}
+	};
+
+
+        </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicits and Typeclasses
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/imgs/Pasted image 20240304220054.png" alt="" style="width: 300px; object-fit: fill">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="RESOURCES/Фотографии/ainr-avatar.png" alt="" style="width: 300px; object-fit: fill">
+
+
+**Хакимов Айнур**
+
+- Scala разработчик в Tinkoff
+- До Tinkoff писал на С/С++
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## План
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/drawing/filp_plan.png" alt="" style="object-fit: scale-down">
+</div>
+
+<aside class="notes"><p>Сегодня у нас седьмое занятие, половина курса позади. На прошлой лекции мы рассматривали коллекции и контейнеры. </p>
+<p>В сегодняшней лекции мы перейдем к рассмотрению имплиситов и тайпклассов.</p>
+<p>Тема является базисом, понимание которой понадобится в будущих лекциях.</p>
+</aside></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## План лекции
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Implicit conversions 
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Implicit parameters
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Implicit classes
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->Type classes
+- &shy;<!-- .element: class="fragment" data-fragment-index="5" -->Simple type classes
+</div></script></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Implicit conversions
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```scala
+val x: String = 123
+```
+
+Скомпилируется ли такой код?
+</div>
+
+<aside class="notes"><p>Давайте начнем с примера. Допустим, у нас есть такой код. Скомпилируется ли он?</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```scala
+val x: String = 123
+
+// [error] ...: type mismatch;
+// [error]  found   : Int(123)
+// [error]  required: String
+// [error]   val x: String = 123
+// [error]                   ^
+// [error] one error found
+// [error] (Compile / compileIncremental) Compilation failed
+```
+</div>
+
+<aside class="notes"><p>Конечно же нет! Мы получим следующую ошибку, поскольку мы пытаемся присвоить строковому типу численный тип и поэтому компилятор бьет нас по рукам, говорит что так делать нельзя</p>
+<p>Но в Scala есть способ сделать так, чтобы такой код скомпилировался. Нам нужно прибегнуть к использованию механизма неявных преобразований. Давайте посмотрим на следующий пример. Такой код скомпилируется!</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Implicit conversions 
+
+```scala[]
+implicit def intToString(x: Int): String = x.toString
+
+val x: String = 123 // будет вызывна неявная функция intToString
+
+// x: "123"
+```
+</div>
+
+<aside class="notes"><p>Давайте посмотрим на следующий пример. Такой код скомпилируется!</p>
+<p>Что тут происходит? У нас есть функция, которая помечена ключевым словом <code>implicit</code>, из-за чего она может вызываться неявно.</p>
+<p>Неявные преобразования могут носить произвольные названия (она же вызывается неявно, зачем ей название).</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Implicits 
+
+```scala
+implicit def intToString1(x: Int): String = x.toString  
+implicit def intToString2(x: Int): String = x.toString  
+  
+val x: String = 123
+
+// [error] Note that implicit conversions are not applicable because they are ambiguous:
+// [error]  both method intToString1 in object Example of type (x: Int): String
+// [error]  and method intToString2 in object Example of type (x: Int): String
+// [error]  are possible conversion functions from Int(123) to String
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Implicits 
+
+Название неявной функции нужно в двух ситуациях
+
+1. Если нужно вызвать функцию явно
+
+```scala[]
+implicit def intToString(x: Int): String = x.toString
+val x: String = intToString(123)
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Implicits 
+
+Название неявной функции нужно в двух ситуациях
+
+2. Для явного импорта
+
+```scala[|4]
+object my_implicits {
+	implicit def intToString(x: Int): String = x.toString
+}
+import my_implicits.intToString
+val x: String = 123
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Implicits
+
+Для определения неявных функций:
+- Нужно использовать ключевое слово `implicit`
+- Это функция должна быть объявлена в trait/class/object/method
+- Должен быть только один параметр в списке аргументов
+</div>
+
+<aside class="notes"><p>Таким образом, </p>
+<ul>
+<li>...</li>
+<li>(не может быть на верхнем уровне)</li>
+<li>...</li>
+</ul>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Implicits
+
+```scala
+implicit def func(paramA: A, paramB: B): C = ???
+
+// такая функция не будет вызыватся неявно
+```
+</div>
+
+<aside class="notes"><p>Последний пункт он особенно интересный, поскольку если мыобъявим имплиситную функцию с несколькими аргументами, то оно не будет работать</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Implicit scopes and priorities
+</div>
+
+<aside class="notes"><p>Давайте еще затронем тему скоупов инплиситов и их приоритеты</p>
+<p>Компилятор будет использовать только те неявные преобразования, которые находятся в области видимости. Поэтому, чтобы обеспечить доступность имплиситных функций, нужно каким то образом поместить их в область видимости. </p>
+<p>Рассмотрим ключевые моменты, на которые стоит обратить внимание</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Implicit scopes and priorities
+
+Local scope
+
+```scala[]
+object Example {  
+  
+  implicit def intToString(x: Int): String = x.toString  
+  
+  val x: String = 123  
+}
+```
+</div>
+
+<aside class="notes"><p>Неявные функции можно определить в текущей области видимости, например, внутри метода или объекта. Такие функции будут иметь приоритет над неявными функциями из других областей видимости.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Implicit scopes and priorities
+
+Imports
+
+```scala[]
+object ExternalImplicits {  
+	implicit def intToString(x: Int): String = x.toString  
+}  
+
+object Example {  
+  
+  import ExternalImplicits.intToString  
+    // OR
+  import ExternalImplicits._  
+  
+  val x: String = 123  
+}
+```
+</div>
+
+<aside class="notes"><p>Имплиситы можно импортировать! Поскольку он могут располагаться уровне отдельных файлов или блоков кода.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Implicit scopes and priorities
+
+Объекты-компаньоны
+
+```scala[]
+trait Currency  
+case class Dollar(amount: Double) extends Currency  
+case class Euro(amount: Double) extends Currency  
+  
+object Currency {  
+	implicit def euroToDollar(euro: Euro): Dollar = Dollar(euro.amount * 1.13)  
+}
+
+object Example extends App {  
+  
+	val dollar: Dollar = Euro(100) // euroToDollar  
+}
+```
+</div>
+
+<aside class="notes"><p>Так же мы может располагать имплиситы в объектах-компаньононах типа, для которого происходит преобразование. Это означает, что если вы определите неявную функцию в объекте-компаньоне класса <code>Currency</code>, то неявная функция будет доступна везде, где доступен тип <code>Currency</code>.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Implicit scopes and priorities
+
+Объекты-компаньоны
+
+```scala[]
+trait Currency  
+case class Dollar(amount: Double) extends Currency  
+case class Euro(amount: Double) extends Currency  
+  
+object Currency {  
+	implicit def euroToDollar(euro: Euro): Dollar = Dollar(euro.amount * 1.13)
+}
+
+object Example extends App {  
+
+	implicit def euroToDollar(euro: Euro): Dollar = Dollar(euro.amount)
+
+	val dollar: Dollar = Euro(100) // ???  
+}
+```
+</div>
+
+<aside class="notes"><p>(вопрос!) Если определены две неявные функции - одна в обьекте компаньене, а другая в текущей области, то какая из них будет использована?</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Предостережение
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/imgs/Pasted image 20240130222235.png" alt="" style="width: 600px; object-fit: fill">
+
+
+Неосознанное использование неявных преобразований может привести написанию трудного для понимания кода.
+</div>
+
+<aside class="notes"><p>Предостережение про неявные преобразования!</p>
+<p>С большой силой приходит большая ответственность!</p>
+<p>Неосознанное использование неявных преобразований может привести написанию трудного для понимания кода. (тем более когда кодовой базы становится много)</p>
+<p>Применять их осознанно только там, где это действительно улучшает код и не создает дополнительной путаницы!</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/imgs/Pasted image 20240130231214.png" alt="" style="width: 600px; object-fit: fill">
+</div>
+
+<aside class="notes"><p>У вас может возникнуть вопрос зачем тогда мы изучали неявные преобразования?
+Ответ такой - это механизм языка о котором стоит знать и понимать как оно работает. Поскольку исплиситы используются не только для преобразований но еще учавствуют в других механизмах.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Вопросы?
+</div></div></div></div></script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit parameters
+
+```scala
+def func(implicit x: Int): Unit = ???
+```
+</div>
+
+<aside class="notes"><p>Помимо определения неявных функций, в скала так же можно определять неявные параметры функций.
+Неявные параметры - это мощная особенность, позволяющая функциям автоматически получать значения для своих параметров из текущей области видимости без явной передачи аргументов при вызове функции.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit parameters
+
+```scala[|1|3|5-6]
+def multiply(x: Int)(implicit y: Int) = x * y
+
+implicit val z: Int = 10 // должна быть неявной
+
+multiply(3) // result: 30 
+multiply(4) // result: 40
+```
+</div>
+
+<aside class="notes"><p>Давайте рассмотрим простой пример. В данном случае у метода <code>multiply</code> параметр <code>y</code> передается неявно. Стоит отметить такой момент, что переменная должна быть объявлена тоже как implicit</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit parameters
+
+```scala
+implicit val z: Int = 10  
+implicit val y: Int = 42  
+  
+multiply(3)
+
+// [error]  ....scala:119:11: ambiguous implicit values:
+// [error]  both value z in object ExampleImplicitParameters of type Int
+// [error]  and value y in object ExampleImplicitParameters of type Int
+// [error]  match expected type Int
+// [error]   multiply(3)
+```
+</div>
+
+<aside class="notes"><p>Если в области видимости будут две неявно определенные переменные с одним и тем же типом, то на выходе получим ошибку компиляции, поскольку компилятору непонятно какую из перременных использовать</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit parameters
+
+```scala[]
+def function(a: Int)(b: Int, c: Int)(implicit d: Int, e: Int) = ???
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit parameters
+
+Примеры объявления
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->`def func(implicit x: Int)` -  x is implicit
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->`def func(implicit x: Int, y: Int)` - x and y are implicit
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->`def func(x: Int, implicit y: Int)` - **wont compile!**
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->`def func(x: Int)(implicit y: Int)` - only y is implicit
+- &shy;<!-- .element: class="fragment" data-fragment-index="5" -->`def func(implicit x: Int)(y: Int)`  - **wont compile!**
+- &shy;<!-- .element: class="fragment" data-fragment-index="6" -->`def func(implicit x: Int)(implicit y: Int)` - **wont compile!**
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit parameters
+
+```scala[|3-6|1|10,12,14]
+case class RequestContext(requestId: String)  
+
+class Logger {
+	def log(msg: String)(ctx: RequestContext): Unit = println(s"[`${ctx.requestId}] $`msg")
+}
+
+object SomeApplication extends App {
+	val logger = new Logger()
+	def handle(requestContext: RequestContext) = {
+		logger.log("Starting process")(requestContext)
+		// some action ...
+		logger.log("Continue process...")(requestContext)
+		// some action ...
+		logger.log("End process")(requestContext)
+	}
+}
+```
+</div>
+
+<aside class="notes"><p>Давайте рассмотрим пример использования неявных параметров больше приближенный к реальной жизни. Допустим у нас есть некое приложение в котором есть логгер. Приложение имеет некоторый контекст, например, он содержит некоторый id запроса, и нам нужно логгировать информацию из этого контекста. При передаче в логгер этого параметра явно в коде приложения при логгировании вынуждены писать <code>logger.log(...)(requestContext)</code></p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit parameters
+
+```scala[|3-6|1|10,12,14]
+case class RequestContext(requestId: String)  
+
+class Logger {
+	def log(msg: String)(implicit ctx: RequestContext): Unit = println(s"[`${ctx.requestId}] $`msg")
+}
+
+object SomeApplication extends App {
+	val logger = new Logger()
+	def handle(implicit requestContext: RequestContext) = {
+		logger.log("Starting process")
+		// some action ...
+		logger.log("Continue process...")
+		// some action ...
+		logger.log("End process")
+	}
+}
+```
+</div>
+
+<aside class="notes"><p>Тогда как сделав параметр запроса неявным, мы можем избавиться от явной передачи этого параметра, тем самым упростив и уменьшив количество кода в бизнес логике нашего приложения.
+Таким образом, неявные параметры позволяют упростить код? + уменьшают количество кода.</p>
+</aside></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit classes
+
+```scala
+implicit class ImplicitClass(val field: Int) extends AnyVal {
+	def extention: Unit = ???
+}
+```
+</div>
+
+<aside class="notes"><p>В Scala есть возможность сделать классы неявными, выглядеть это будет следующим образом.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit classes
+
+```scala
+implicit class ImplicitClass(val field: Int) extends AnyVal {
+	def extention: Unit = ???
+}
+```
+
+Зачем они нужны?
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Разница между нашим и не нашим кодом
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/drawing/drawing 2024-01-31 00.06.44.png" alt="" style="width: 800px; object-fit: fill">
+</div>
+
+<aside class="notes"><p>Между вашим кодом и библиотеками других разработчиков существует принципиальная разница: свой код при желании можно изменить или расширить, но если нужно воспользоваться чьими-либо библиотеками, то зачастую приходится принимать их такими, какие они есть. Чтобы облегчить решение этой проблемы, в языках программирования появился ряд конструкций.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 60%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+ООП подход
+
+Паттерн Adapter
+</div>
+
+<div class="" style="position: absolute; left: 40%; top: 20%; height: 60%; width: 60%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+```scala[]
+class IntAdapter(val i: Int) {
+  def isEven: Boolean = i % 2 == 0
+  def isOdd: Boolean = !isEven
+}
+
+// Создание экземпляра адаптера и использование его методов
+new IntAdapter(42).isEven  // true
+new IntAdapter(42).isOdd   // false
+```
+</div>
+</div>
+
+<aside class="notes"><p>Давайте рассмотрим пример! Например, в стандартной библиотеке есть тип <code>Int</code> - мы хотели бы его расширить своими методами для проверки на четность и нечетность.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 60%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+Implicit classes
+</div>
+
+<div class="" style="position: absolute; left: 40%; top: 20%; height: 60%; width: 60%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+```scala[]
+implicit class RichInt(val i: Int) extends AnyVal {
+  def isEven: Boolean = i % 2 == 0
+  def isOdd: Boolean = !isEven
+}
+
+// Можем вызывать методы
+42.isEven  // true
+42.isOdd   // false
+```
+</div>
+</div>
+
+<aside class="notes"><p>Так же Мы можем сделать это написав имплиситный класс, который имеет поле с типом Int, и в нем реализованы те самые методы для проверки числа на четность и нечетность</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 60%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+А что там под капотом?
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/imgs/Pasted image 20240311210500.png" alt="" style="width: 400px; object-fit: fill">
+
+</div>
+
+<div class="" style="position: absolute; left: 40%; top: 20%; height: 60%; width: 60%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+```scala[]
+implicit class RichInt(val i: Int) extends AnyVal {
+  def isEven: Boolean = i % 2 == 0
+  def isOdd: Boolean = !isEven
+}
+
+// Обессахаренный код
+Example.RichInt(42).isEven // true
+Example.RichInt(42).isOdd  // false
+```
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+> Имплиситные классы позволяют нам расширять функционал типов и классов не прибегая к наследованию или изменению
+</div>
+
+<aside class="notes"><p>В Scala в ответ на это были реализованы имплиситные классы. Они позволяют нам расширять функционал классов и типов не прибегая к наследованию или изменению кода этих классов и типов.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Implicit classes
+
+- `extends AnyVal` в Scala используется для создания **value classes**, которые представляют собой механизм оптимизации, позволяющий избежать выделения памяти
+</div>
+
+<aside class="notes"><blockquote>
+<p><code>extends AnyVal</code> в Scala используется для создания <strong>value classes</strong>, которые представляют собой механизм оптимизации, позволяющий избежать выделения памяти для объектов-оберток в куче. Это особенно полезно для улучшения производительности приложений и снижения нагрузки на сборщик мусора, создавая классы, которые во время выполнения представлены как примитивные значения.</p>
+</blockquote>
+</aside></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Type classes
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/imgs/Pasted image 20240131221821.png" alt="" style="width: 700px; object-fit: fill">
+</div>
+
+<aside class="notes"><p>Тайпкласс - это паттерн, используемый в функциональном программировании для обеспечения Ad-hoc полиморфизма, известного как перегрузка методов. Этот паттерн позволяет писать код, в котором мы оперируем интерфейсами и абстракциями и при этом использовать правильную реализацию этих абстракций на основе типов.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Type classes
+
+>  Тайпкласс - это паттерн, используемый в функциональном программировании для обеспечения Ad-hoc полиморфизма
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Type classes
+
+>  Тайпкласс - это паттерн, используемый в функциональном программировании для обеспечения Ad-hoc полиморфизма
+
+_Зачем они нужны? Причем тут полиморфизм?_
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через наследование
+
+
+
+```scala[]
+trait Area {
+  def area: Double
+}
+
+class Circle(radius: Double) extends Area {
+  override def area: Double = math.Pi * math.pow(radius, 2)
+}
+
+class Rectangle(width: Double, length: Double) extends Area {
+  override def area: Double = width * length
+}
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через наследование
+
+
+
+```scala[]
+trait Area {
+  def area: Double
+}
+
+class Circle(radius: Double) extends Area {
+  override def area: Double = math.Pi * math.pow(radius, 2)
+}
+
+class Rectangle(width: Double, length: Double) extends Area {
+  override def area: Double = width * length
+}
+```
+
+```scala[]
+// Обобщенная функция
+def areaOf(area: Area): Double = area.area
+
+areaOf(new Circle(10))
+areaOf(new Rectangle(5, 5))
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 5  Implicits/drawing/tpcls.png" alt="" style="width: 800px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через тайпклассы
+
+
+
+```scala[]
+// сущности, представляющие данные
+case class Circle(radius: Double)
+case class Rectangle(width: Double, length: Double)
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через тайпклассы
+
+
+
+```scala[]
+// сущности, представляющие данные
+case class Circle(radius: Double)
+case class Rectangle(width: Double, length: Double)
+```
+
+```scala[]
+// тайпкласс
+trait Area[A] {
+  def area(a: A): Double
+}
+
+// сущности, отвечающие за реализацию
+object CircleArea extends Area[Circle] {
+  override def area(circle: Circle) : Double = math.Pi * math.pow(circle.radius, 2)
+}
+
+object RectangleArea extends Area[Rectangle] {
+  override def area(rectangle: Rectangle): Double = rectangle.width * rectangle.length
+}
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через тайпклассы
+
+
+
+```scala[]
+// сущности, представляющие данные
+case class Circle(radius: Double)
+case class Rectangle(width: Double, length: Double)
+```
+
+```scala[]
+// тайпкласс
+trait Area[A] {
+  def area(a: A): Double
+}
+
+// сущности, отвечающие за реализацию
+object CircleArea extends Area[Circle] {
+  override def area(circle: Circle) : Double = math.Pi * math.pow(circle.radius, 2)
+}
+
+object RectangleArea extends Area[Rectangle] {
+  override def area(rectangle: Rectangle): Double = rectangle.width * rectangle.length
+}
+```
+
+```scala[]
+// Обобщенная функция
+def areaOf[A](shape: A, area: Area[A]): Double = area.area(shape)
+
+areaOf(Circle(42), CircleArea)
+areaOf(Rectangle(12, 15), RectangleArea)
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через тайпклассы
+
+```scala[]
+// Обобщенная функция
+def areaOf[A](shape: A, area: Area[A]): Double = area.area(shape)
+
+// Слишком много кода
+areaOf(Circle(42), new CircleArea)
+areaOf(Rectangle(12, 15), new RectangleArea)
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через тайпклассы
+
+
+
+```scala[]
+// Инстансы тайплкассов
+implicit val circleArea: Area[Circle] = new Area[Circle] {
+  override def area(circle: Circle) : Double = math.Pi * math.pow(circle.radius, 2)
+}
+
+implicit val rectangleArea: Area[Rectangle] = new Area[Rectangle] {
+  override def area(rectangle: Rectangle): Double = rectangle.width * rectangle.length
+}
+```
+
+```scala[]
+// Обобщенная функция
+def areaOf[A](figure: A)(implicit area: Area[A]): Double = area.area(figure)
+
+areaOf(Circle(42))
+areaOf(Rectangle(12, 15))
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Полиморфизм через тайпклассы
+
+```scala[]
+// Синтаксис для тайпкласса Area
+implicit class AreaSyntax[A](val figure: A) extends AnyVal {
+  def area(implicit area: Area[A]): Double = area.area(figure)
+}
+
+Circle(42).area
+Rectangle(12, 15).area
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+- Тайпклассы можно реализовать не только в Scala
+- За счет имплиситов тайпклассы в Scala выглядят более выразительно
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Анатомия тайпклассов
+
+- trait (сам тайпкласс)
+- методы тайпклассов
+- инстансы тайпклассов
+- implicit class - синтаксис (опционально)
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Анатомия тайпклассов
+
+```scala
+// тайпкласс
+trait TypeClass[A] {
+	def method(value: A): Unit
+}
+```
+</div>
+
+<aside class="notes"><p>Давайте рассмотрим эти компоненты поподробнее. Вот пример трейта, это собственно сам тайпкласс у которого есть некоторый метод. Важно обратить внимание, что этот трейт параметризован некоторым типом <code>A</code>.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Анатомия тайпклассов
+
+```scala[]
+// Инстансы
+implicit val intInstance: TypeClass[Int] = new TypeClass[Int] {
+	def method(value: Int): Unit = ???
+}
+
+implicit val intInstance: TypeClass[String] = new TypeClass[String] {
+	def method(value: String): Unit = ???
+}
+```
+</div>
+
+<aside class="notes"><p>Далее мы создаем инстансы этого тайпкласса, например для типа <code>Int</code>. По сути мы тут пишем реализацию класса и создаем его экземпляр, причем инстанс его создается ввиде неявной переменной. Обычно инстансы размещают внутри объекта, который имнуется названием тайпкласса и приставкой <code>Instances</code>.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Анатомия тайпклассов
+
+```scala[]
+// Синтаксис
+implicit class TypeClassOps[A](private val value: A) extends AnyVal {
+	def method(implicit ev: TypeClass[A]): Unit = ev.method(value)
+}
+```
+</div>
+
+<aside class="notes"><p>Ну и необязательный компонент тайпклассов - это имплиситный класс, который позволяет создать некоторый синтаксис для нашего тайпкласса или точнее для типов. Этот момент мы рассмотрим поподробнее на примерах.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Использование тайпкласса
+
+```scala[]
+object SomeApp {  
+  def someMethod[A](arg: A)(implicit t: TypeClass[A]): Unit = {  
+    t.method(arg)  
+  }  
+}
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Использование тайпкласса
+
+```scala[]
+trait TypeClass[A] {
+	def method(value: A): Unit
+}
+
+// создаем объект с методом apply
+object TypeClass {
+	def apply[A](implicit ev: TypeClass[A]): TypeClass[A] = ev
+}
+```
+
+```scala[]
+object SomeApp {
+	def someMethod[A: TypeClass](arg: A): Unit = {
+		// достаем инстанс через apply
+		TypeClass[A].method(arg)
+	}
+}
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Использование синтаксиса
+
+```scala[]
+object SomeApp {  
+  import TypeClassSyntax._  
+  
+  def someMethod[A: TypeClass](arg: A): Unit = {  
+    arg.method
+  }  
+}
+```
+</div></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Simple type classes
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+`Show` - альтернатива Java `toString`.
+</div>
+
+<aside class="notes"><p>Show - это альтернатива Java <code>toString</code> метод. Он определяется единственной функцией <code>show</code>, который умеет преобразовывать типы в строковое представление</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+Что не так с `.toString`?
+
+```scala
+(new {}).toString
+// res0: String = "repl.MdocSession`$MdocApp$`anon$1@7de74c88"
+```
+
+`toString` определен для `Object` и может быть вызван для чего угодно
+</div>
+
+<aside class="notes"><p>Вам может быть интересно, почему вы хотели бы использовать это, учитывая, что <code>toString</code> уже служит той же цели, и case классы уже предоставляют разумные реализации для <code>toString</code>. Разница в том, что <code>toString</code> определено на <code>Any</code>(Java <code>Object</code>) и, следовательно, может быть вызван для чего угодно, а не только для классов case. Чаще всего это нежелательное поведение, поскольку стандартная реализация <code>toString</code> в классах без регистра это в основном тарабарщина. </p>
+<p>Тот факт, что этот код компилируется, является недостатком дизайна Java API. Мы хотим сделать подобные вещи невозможными, предлагая <code>toString</code> эквивалент в качестве тайпкласса <code>Show</code>.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+`Show` позволяет нам определять преобразования в строковое представление только для тех типов данных, которые нам действительно нужны.
+</div>
+
+<aside class="notes"><p>Вкратце, <code>Show</code> позволяет нам определять преобразования строк только для тех типов данных, которые нам действительно нужны.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+```scala[]
+// тайпкласс
+trait Show[A] {  
+    def show(value: A): String  
+}  
+
+// объект-компаньон с методом apply
+object Show {  
+    def apply[A](implicit ev: Show[A]): Show[A] = ev  
+}  
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+```scala[]
+// инстансы для Int и String
+  object ShowInstances {  
+    implicit val showInt = new Show[Int] {  
+      def show(value: Int): String = value.toString  
+    }  
+  
+    implicit val showString = new Show[String] {  
+      def show(value: String): String = value  
+    }  
+  }  
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+```scala[]
+// синтаксис
+object ShowSyntax {  
+    implicit class ShowOps[A](private val value: A) extends AnyVal {  
+      def show(implicit ev: Show[A]): Unit = ev.show(value)  
+    }  
+}  
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+Пример использования c примитивными типами
+
+```scala[]
+import ShowInstances._
+import ShowSyntax._  
+  
+val meaningOfLife = 42  
+  
+Show[Int].show(meaningOfLife)   // result: "42"  
+// OR
+meaningOfLife.show   // result: "42"  
+```
+</div>
+
+<aside class="notes"><p>Есть переменная с типом Int</p>
+<p>Можем вызывать получив инстанс тайпкласса через метод apply объекта компаньона</p>
+<p>Или через синтаксис нашего тайпкласса</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Show
+
+Пример использования c кастомными типами
+
+```scala[]
+import ShowInstances._
+import ShowSyntax._  
+
+case class User(name: String, age: Int)  
+  
+object User {  
+    implicit val showUser = new Show[User] {  
+      def show(user: User): String =  
+        s"User(name = `${user.name}, age = $`{user.age})"  
+    }  
+}  
+  
+val user = User("Mark", 25)  
+user.show //   result: "User(name = Mark, age = 25)"  
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+```scala[]
+trait Eq[A] {  
+  def eqv(x: A, y: A): Boolean  
+}
+```
+
+`Eq` является альтернативой Java `equals`
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+Что не так с Java `equals`?
+</div>
+
+<aside class="notes"><p>В Scala можно сравнивать любые два значения, используя <code>==</code> (которое не соответствует Java <code>equals</code>). Это потому, что <code>equals</code> сигнатура типа использует <code>Any</code> (Java <code>Object</code>) для сравнения двух значений.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+Что не так с Java `equals`?
+
+```scala
+"Hello" == 42
+```
+</div>
+
+<aside class="notes"><p>Это означает, что мы можем сравнить два совершенно не связанных типа без получения ошибки компилятора. Компилятор Scala может предупреждать нас в некоторых случаях, но не во всех, что может привести к некоторым странным ошибкам.</p>
+<p>В идеале Scala не должна позволять нам сравнивать два типа, которые никогда не могут быть равны.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+```scala[]
+// Тайпкласс
+trait Eq[A] {  
+  def eqv(x: A, y: A): Boolean  
+}  
+
+// Объект компаньон с методом apply
+object Eq {  
+  def apply[A](implicit ev: Eq[A]): Eq[A] = ev  
+}  
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+```scala[]
+// инстансы для Int и String
+object EqInstances {  
+  implicit val eqInt = new Eq[Int] {  
+    def eqv(x: Int, y: Int): Boolean = x == y  
+  }  
+  
+  implicit val eqString = new Eq[String] {  
+    def eqv(x: String, y: String): Boolean = x == y  
+  }  
+}  
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+```scala[]
+// Синтаксис
+object EqSyntax {  
+  implicit class EqOps[A](private val x: A) extends AnyVal { 
+   
+    def eqv(y: A)(implicit ev: Eq[A]): Unit = ev.eqv(x, y)  
+    
+    def ===(y: A)(implicit ev: Eq[A]): Unit = ev.eqv(x, y)  
+    
+    def =!=(y: A)(implicit ev: Eq[A]): Unit = !ev.eqv(x, y)  
+  }  
+}
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+Пример использования c примитивными типами
+
+```scala[]
+import EqInstances._  
+import EqSyntax._  
+
+Eq[Int].eqv(2 + 2, 4)   // result: true  
+  
+"Hello" === "world"     // result: false  
+"Hello" =!= "world"     // result: true  
+```
+</div>
+
+<aside class="notes"><p>можем использовать через метод eqv</p>
+<p>или использовать синтаксис, который выглядит более выразительно</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+Пример использования c примитивными типами
+
+```scala[]
+import EqInstances._  
+import EqSyntax._  
+
+"Hello" === 42  
+/*  
+  [error]  App.scala:202:15: type mismatch;  
+  [error]  found   : Int(42)  
+  [error]  required: String  
+  [error]   "Hello" === 42  
+  [error]               ^  
+  [error] one error found  
+  [error] (Compile / compileIncremental) Compilation failed */
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Eq
+
+Пример использования c кастомными типами
+
+```scala[]
+case class User(name: String, age: Int)
+  
+object User {
+  implicit val eqUser = new Eq[User] {
+    def eqv(x: User, y: User): Boolean = {
+      x.name === y.name && x.age === y.age
+    }
+  }
+}
+  
+val mark = User("Mark", 25)
+val joe = User("Joe", 33)
+  
+mark === joe  // result: false
+```
+</div></script></section></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Сегодня рассмотрели:
+- Implicit conversions 
+- Implicit parameters
+- Implicit classes
+- Type classes
+- Simple type classes
+</div>
+
+<aside class="notes"><p>На следующем занятии мы перейдем к рассмотрению классических тайпклассов в функциональном программировании. Вопросы?!</p>
+</aside></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Спасибо за внимание!
+</div></script></section></div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/math/math.js"></script>
+	<script src="plugin/mermaid/mermaid.js"></script>
+	<script src="plugin/chart/chart.min.js"></script>
+	<script src="plugin/chart/plugin.js"></script>
+	<script src="plugin/menu/menu.js"></script>
+	<script src="plugin/customcontrols/plugin.js"></script>
+	<script src="plugin/reveal-pointer/pointer.js"></script>
+	<script src="plugin/elapsed-time-bar/elapsed-time-bar.js"></script>
+
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+	  function isLight(color) {
+		let hex = color.replace('#', '');
+
+		// convert #fff => #ffffff
+		if(hex.length == 3){
+			hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+		}
+
+		const c_r = parseInt(hex.substr(0, 2), 16);
+		const c_g = parseInt(hex.substr(2, 2), 16);
+		const c_b = parseInt(hex.substr(4, 2), 16);
+		const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+		return brightness > 155;
+	}
+
+	var bgColor = getComputedStyle(document.documentElement).getPropertyValue('--r-background-color').trim();
+	var isLight = isLight(bgColor);
+
+	if(isLight){
+		document.body.classList.add('has-light-background');
+	} else {
+		document.body.classList.add('has-dark-background');
+	}
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath.MathJax3,
+		  RevealMermaid,
+		  RevealChart,
+		  RevealCustomControls,
+		  RevealMenu,
+	      RevealPointer,
+		  ElapsedTimeBar
+        ],
+
+
+    	allottedTime: 120 * 1000,
+
+		mathjax3: {
+			mathjax: 'plugin/math/mathjax/tex-mml-chtml.js',
+		},
+		markdown: {
+		  gfm: true,
+		  mangle: true,
+		  pedantic: false,
+		  smartLists: false,
+		  smartypants: false,
+		},
+
+		mermaid: {
+			theme: isLight ? 'default' : 'dark',
+		},
+
+		customcontrols: {
+			controls: [
+			]
+		},
+		menu: {
+			loadIcons: false
+		}
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"width":1520,"height":980,"margin":0.04,"controls":true,"progress":true,"slideNumber":true,"showNotes":false,"transition":"slide","transitionSpeed":"normal"}, queryOptions);
+    </script>
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+
+  <!-- created with Advanced Slides -->
+</html>
