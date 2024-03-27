@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title></title>
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/serif.css" id="theme" />
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+	<link rel="stylesheet" href="css/layout.css" />
+	<link rel="stylesheet" href="plugin/customcontrols/style.css">
+
+	<link rel="stylesheet" href="plugin/reveal-pointer/pointer.css" />
+
+
+    <script defer src="dist/fontawesome/all.min.js"></script>
+
+	<script type="text/javascript">
+		var forgetPop = true;
+		function onPopState(event) {
+			if(forgetPop){
+				forgetPop = false;
+			} else {
+				parent.postMessage(event.target.location.href, "app://obsidian.md");
+			}
+        }
+		window.onpopstate = onPopState;
+		window.onmessage = event => {
+			if(event.data == "reload"){
+				window.document.location.reload();
+			}
+			forgetPop = true;
+		}
+
+		function fitElements(){
+			const itemsToFit = document.getElementsByClassName('fitText');
+			for (const item in itemsToFit) {
+				if (Object.hasOwnProperty.call(itemsToFit, item)) {
+					var element = itemsToFit[item];
+					fitElement(element,1, 1000);
+					element.classList.remove('fitText');
+				}
+			}
+		}
+
+		function fitElement(element, start, end){
+
+			let size = (end + start) / 2;
+			element.style.fontSize = `${size}px`;
+
+			if(Math.abs(start - end) < 1){
+				while(element.scrollHeight > element.offsetHeight){
+					size--;
+					element.style.fontSize = `${size}px`;
+				}
+				return;
+			}
+
+			if(element.scrollHeight > element.offsetHeight){
+				fitElement(element, start, size);
+			} else {
+				fitElement(element, size, end);
+			}		
+		}
+
+
+		document.onreadystatechange = () => {
+			fitElements();
+			if (document.readyState === 'complete') {
+				if (window.location.href.indexOf("?export") != -1){
+					parent.postMessage(event.target.location.href, "app://obsidian.md");
+				}
+				if (window.location.href.indexOf("print-pdf") != -1){
+					let stateCheck = setInterval(() => {
+						clearInterval(stateCheck);
+						window.print();
+					}, 250);
+				}
+			}
+	};
+
+
+        </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/monads_child.png" alt="" style="width: 1000px; object-fit: fill">
+
+
+Что это за слово, которым пугают ООП-разработчиков?
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="RESOURCES/Фотографии/ainr-avatar.png" alt="" style="width: 300px; object-fit: fill">
+
+
+**Хакимов Айнур**
+
+- Scala разработчик в Tinkoff
+- До Tinkoff писал на С/С++
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## План курса ФИЛП 2024
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/filp_plan7.png" alt="" style="width: 1400px; object-fit: fill">
+</div>
+
+<aside class="notes"></aside></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## План лекции
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Поймем, что такое монада и для чего она нужна
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Увидим, какие нам знакомые структуры являются монадами
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Рассмотрим монады Reader, Writer, State
+</div></script></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Monad
+
+Что это такое?
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Monad
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/Снимок экрана 2024-02-21 в 00.11.34.png" alt="" style="object-fit: scale-down">
+</div>
+
+<aside class="notes"><p>Определение над которым люди любят шутить</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Monad
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/Снимок экрана 2024-02-21 в 00.11.46.png" alt="" style="object-fit: scale-down">
+</div>
+
+<aside class="notes"><p>Определение ближе к практическому смыслу. Мы его поймем по ходу нашей лекции.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Вычисления
+
+- Независимые
+- Последовательные
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Независимые вычисления
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/what is monad_1.png" alt="" style="width: 1000px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Независимые вычисления
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/what is monad 1.png" alt="" style="width: 1000px; object-fit: fill">
+</div>
+
+<aside class="notes"><p>Здесь можно объяснить ключевые отличия между монадами и аппликативными функторами</p>
+<p> Аппликативные функторы поддерживают &quot;независимые&quot; вычисления, где результат одного вычисления не влияет на другие.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Независимые вычисления
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/what is monad_1_1.png" alt="" style="width: 1000px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Независимые вычисления
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/what is monad 1 1.png" alt="" style="width: 1000px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+#### Последовательные вычисления
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/what is monad 2.png" alt="" style="width: 1000px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+#### Последовательные вычисления
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/what is monad 2 1.png" alt="" style="width: 1000px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+#### Последовательные вычисления
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/what is monad 2 1.png" alt="" style="width: 1000px; object-fit: fill">
+
+
+<div class="" style="position: absolute; left: 10%; top: 60%; height: 40%; width: 80%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/Pasted image 20240219235852.png" alt="" style="width: 200px; object-fit: fill">
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+|           | Method    | From   | Given           | To     |
+| --------- | --------- | ------ | --------------- | ------ |
+| `Functor` | `map`     | `F[A]` | **`A => B`**    | `F[B]` |
+| `Monad`   | `flatMap` | `F[A]` | **`A => F[B]`** | `F[B]` |
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Option Monad
+
+```scala
+Option("42").flatMap(value => value.toIntOption)  // Option[Int]
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Option Monad
+
+```scala
+Option("42").flatMap(value => value.toIntOption)  // Option[Int]
+```
+
+```scala
+Option("42")
+	.map(value => value.toIntOption) // Option[Option[Int]]
+	.flatten                         // Option[Int]
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 30%; top: 0%; height: 50%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+### Option Monad
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 25%; height: 50%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+```scala[]
+def loadUserOption(tag: String): Option[User] =  
+  idByTag(tag).flatMap {  
+    id => nameById(id).flatMap {  
+      name => surnameById(id).map {  
+        surname => User(id, name, surname)  
+      }
+    }
+  }
+```
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+=
+
+<div class="" style="position: absolute; left: 30%; top: 0%; height: 50%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+### For Comprehention
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 25%; height: 50%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+```scala[]
+def loadUserOption(tag: String): Option[User] =  
+  idByTag(tag).flatMap {  
+    id => nameById(id).flatMap {  
+      name => surnameById(id).map {  
+        surname => User(id, name, surname)  
+      }
+    }
+  }
+```
+</div>
+
+<div class="" style="position: absolute; left: 50%; top: 25%; height: 50%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+```scala[]
+def loadUserOption(tag: String): Option[User] =  
+  for {
+    id      <- idByTag(tag)  
+    name    <- nameById(id)  
+    surname <- surnameById(id)  
+  } yield User(id, name, surname)
+```
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 30%; top: 0%; height: 50%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+### For Comprehention
+</div>
+
+<div class="" style="position: absolute; left: 50%; top: 25%; height: 50%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+```scala[]
+def loadUserOption(tag: String): Option[User] =  
+  for {
+    id      <- idByTag(tag)  
+    name    <- nameById(id)  
+    surname <- surnameById(id)  
+  } yield User(id, name, surname)
+```
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 40%; height: 60%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/Pasted image 20240218230118.png" alt="" style="object-fit: scale-down">
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 60%; width: 60%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+### Either Monad
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/either monad.png" alt="" style="width: 500px; object-fit: fill">
+
+</div>
+
+<div class="" style="position: absolute; left: 60%; top: 20%; height: 60%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/eithenberg.png" alt="" style="width: 800px; object-fit: fill">
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 60%; width: 60%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+### Either Monad
+
+```scala[]
+Right("42").flatMap(
+	value => value.toIntOption.toRight("Parse failed")
+)
+```
+</div>
+
+<div class="" style="position: absolute; left: 60%; top: 20%; height: 60%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/eithenberg.png" alt="" style="width: 800px; object-fit: fill">
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 60%; width: 60%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+### Either Monad
+
+```scala[]
+def loadUserEither(tag: String): Either[Error, User] =  
+  for {  
+    id      <- idByTag(tag)  
+    name    <- nameById(id)  
+    surname <- surnameById(id)  
+  } yield User(id, name, surname)
+```
+</div>
+
+<div class="" style="position: absolute; left: 60%; top: 20%; height: 60%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/eithenberg.png" alt="" style="width: 800px; object-fit: fill">
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Monad
+
+```scala[]
+trait Monad[F[_]] extends Applicative[F] {
+    def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
+}
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Monad
+
+```scala
+import Monad.Syntax._
+
+def loadUser[F[_]: Monad](tag: String): F[User] = {
+  for {
+    id      <- idByTag(tag)
+    name    <- nameById(id)
+    surname <- surnameById(id)
+  } yield User(id, name, surname)
+}
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Monad
+
+```scala
+import Monad.Syntax._
+
+def loadUser[F[_]: Monad](tag: String): F[User] = {
+  for {
+    id      <- idByTag(tag)
+    name    <- nameById(id)
+    surname <- surnameById(id)
+  } yield User(id, name, surname)
+}
+```
+
+```scala
+loadUser[Option]("123")
+loadUser[Either[String, *]]("444")
+loadUser[Try]("456")
+loadUser[CustomType]("456")
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/Pasted image 20240320133822.png" alt="" style="object-fit: scale-down">
+
+
+Посмотрим на примеры кода с монадами
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Вопросы?
+</div></div></div></div></div></div></div></script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Monad Laws
+
+```scala
+// Left identity
+Monad[F].pure(a).flatMap(f) == f(a)
+
+// Right identity
+fa.flatMap(Monad[F].pure) == fa
+
+// Associativity
+fa.flatMap(f).flatMap(g) == fa.flatMap(a => f(a).flatMap(g))
+```
+</div>
+
+<aside class="notes"><p>Так же, как в отношении функторов и аппликативных функторов, в отношении монад действует несколько законов, которым должны подчиняться все экземпляры класса Monad. Даже если что-то сделано экземпляром класса типов Monad, это ещё не означает, что на самом деле перед нами монада. Чтобы тип по-настоящему был монадой, для него должны выполняться законы монад. Эти законы позволяют нам делать обоснованные предположения о типе и его поведении.</p>
+<p>Первый закон монад утверждает, что если мы берём значение, помещаем его в контекст по умолчанию с помощью функции return, а затем передаём его функции, используя операцию &gt;&gt;=, это равнозначно тому, как если бы мы просто взяли значение и применили к нему функцию.</p>
+<p>Второй закон утверждает, что если у нас есть монадическое значение и мы используем операцию &gt;&gt;= для передачи его функции return, результатом будет наше изначальное монадическое значение. Формально m &gt;&gt;= return является не чем иным, как просто m.</p>
+<p>Последний монадический закон говорит, что когда у нас есть цепочка применений монадических функций с помощью операции &gt;&gt;=, не должно иметь значения то, как они вложены</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/Pasted image 20240320133822.png" alt="" style="object-fit: scale-down">
+
+
+Посмотрим на примеры кода
+</div></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## MonadError
+
+```scala[]
+trait MonadError[F[_], E] extends Monad[F] {  
+  def raiseError[A](e: E): F[A]  
+  
+  def handleErrorWith[A](fa: F[A])(f: E => F[A]): F[A]  
+}
+```
+</div>
+
+<aside class="notes"><p>Во время наших вычислений могут происходить ошибки, которые нужно выкидывать и обрабатывать. Для этого существует MonadError, который имеет метод raiseError, который позволяет прервать вычисление и вернуть ошибку и метод handleErrorWith который позволяет обрабатывать ошибки.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/Pasted image 20240320135001.png" alt="" style="object-fit: scale-down">
+
+
+Переключимся в IDEA и посмотрим примеры кода
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Вопросы?
+</div></script></section></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/Pasted image 20240325032420.png" alt="" style="width: 800px; object-fit: fill">
+
+
+(начинается сложная часть лекции)
+</div>
+
+<aside class="notes"><p>надо сделать дисклеймер, сказать что до этого момента было изи, начинается сложная часть лекции, надо сконцентрироваться!</p>
+</aside></script></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Reader Monad
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/imgs/telegram-cloud-photo-size-4-5768419560368747404-x.jpg" alt="" style="width: 400px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Reader Monad
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/monad_reader.png" alt="" style="width: 1100px; object-fit: fill">
+</div>
+
+<aside class="notes"><ul>
+<li>reader - избавление от глобальной переменной</li>
+</ul>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/Pasted image 20240320135001.png" alt="" style="object-fit: scale-down">
+
+
+Переключимся в IDEA и посмотрим примеры кода
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Reader Monad
+
+```scala[]
+// На самом деле это просто  функция
+final case class Reader[Ctx, Out](run: Ctx => Out)
+  
+object Reader {  
+  // Позволяет извлечь информацию из контекста  
+  def ask[Ctx, CtxInfo](f: Ctx => CtxInfo): Reader[Ctx, CtxInfo] = Reader(f)
+
+// ...
+```
+</div>
+
+<aside class="notes"><p>Монада <code>Reader</code> используется в функциональном программировании для выполнения вычислений, которые зависят от некоторого общего контекста или конфигурации. В вашем примере <code>Reader</code> реализован как case класс с одним методом <code>run</code>, который принимает контекст <code>Ctx</code> и возвращает результат <code>Out</code>.</p>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Reader Monad
+
+```scala[]
+def httpRequest(url: String): Reader[Config, String] = {  
+  println(s"Http request $url")  
+  "Bob".pure[Reader[Config, *]]  
+}  
+  
+def getUserName(id: Int): Reader[Config, String] = for {  
+  url  <- Reader.ask[Config, String](_.url)  
+  name <- httpRequest(s"`$url/$`id")  
+} yield name  
+  
+getUserName(42).run(Config("http://service.ru/users"))  
+```
+</div></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Writer Monad
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Writer Monad
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/monad_writer.png" alt="" style="width: 1100px; object-fit: fill">
+</div>
+
+<aside class="notes"><ul>
+<li>writer - избавление сайд-эффектных функций</li>
+</ul>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Writer Monad
+
+```scala[]
+case class Writer[Log, Value](run: (Log, Value)) {  
+
+  // Позволяет делать записи в Log
+  def tell(message: Log)(implicit monoid: Monoid[Log]): Writer[Log, Value] =  
+    run match {  
+      case (log, value) => Writer((log |+| message, value))  
+    }  
+}
+
+// ...
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Writer Monad
+
+```scala[]
+type Logs = List[String]  
+  
+def httpRequest(url: String): Writer[Logs, String] = for {  
+  _        <- Writer.tell[Logs](List(s"Http request $url"))  
+  response <- "Bob".pure[Writer[Logs, *]]  
+} yield response
+  
+def getUserName(id: Int): Writer[Logs, String] = for {  
+  name <- httpRequest(s"http://some-service/$id")  
+  _    <- Writer.tell[Logs](List(s"Fetched name $name"))  
+} yield name  
+  
+val (logs, result) = getUserName(42).run
+// Http request http://some-service/42
+// Fetched name Bob
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+<!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/Pasted image 20240320133705.png" alt="" style="object-fit: scale-down">
+
+
+Переключимся в IDEA и посмотрим на примеры кода
+</div></div></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### State Monad
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### State Monad
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/monad_state.png" alt="" style="width: 1100px; object-fit: fill">
+</div>
+
+<aside class="notes"><ul>
+<li>state - избавление от мутабельных состояний</li>
+</ul>
+</aside></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### State Monad
+
+```scala[]
+// Тоже просто функция
+final case class State[S, V](run: S => (V, S))
+  
+object State {  
+  // Запрашивает состояние
+  def ask[S, StateCtx](f: S => StateCtx): State[S, StateCtx] =  
+    State(current => (f(current), current))  
+
+  // Обновляет состояние
+  def update[S](f: S => S): State[S, Unit] =  
+    State(current => ((), f(current)))
+
+// ...
+```
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### State Monad
+
+```scala[]
+def updateStateExample(str: String): State[Int, String] = for {  
+  current <- State.ask[Int, Int](identity)  
+  _ <- str match {  
+    case "increment" => State.update[Int](_ + 1)  
+    case "decrement" => State.update[Int](_ - 1)  
+    case _ => State.update[Int](identity) // do nothing  
+  }  
+  updated <- State.ask[Int, Int](identity)  
+} yield if (current != updated) "updated" else "unchanged"  
+  
+val (result, state) = updateStateExample("increment").run(100)  
+// result=updated, state=101
+```
+</div></script></section><section data-markdown><script type="text/template">
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/Pasted image 20240320133705.png" alt="" style="object-fit: scale-down">
+
+
+Переключимся в IDEA и посмотрим на примеры кода
+</script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/rws 1.png" alt="" style="object-fit: scale-down">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/rws 1 1.png" alt="" style="object-fit: scale-down">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/rws 1 1 1.png" alt="" style="object-fit: scale-down">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/rws 2.png" alt="" style="object-fit: scale-down">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/rws 3.png" alt="" style="object-fit: scale-down">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/rws 4.png" alt="" style="object-fit: scale-down">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/rws.png" alt="" style="object-fit: scale-down">
+</div></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+#### Пример реального использования Reader монады
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+#### Пример реального использования Reader монады
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/readr_for_context.png" alt="" style="width: 1100px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+#### Пример реального использования Reader монады
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 7 - Monad/excalidraw/readr_for_context 1.png" alt="" style="width: 1100px; object-fit: fill">
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/Pasted image 20240320133705.png" alt="" style="object-fit: scale-down">
+
+
+Переключимся в IDEA и посмотрим примеры кода
+</div></script></section><section data-markdown><script type="text/template">
+Вопросы?
+</script></section></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Scala with Cats
+
+<img src="https://typelevel.org/cats/img/cats2.png" alt="" style="width: 300px; object-fit: fill">
+
+
+> Cats (categories) is a library which provides abstractions for functional programming in the [Scala programming language](https://scala-lang.org/)
+
+- https://typelevel.org/cats/
+- https://www.scalawithcats.com/
+- https://eed3si9n.com/herding-cats/
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 980.0000000000001px; width: 1520px; min-height: 980.0000000000001px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="AREAS/Work/ФИЛП/2024/ФИЛП. Лекция 6 - Foldable, Functor, Applicative/memes/meme3.png" alt="" style="width: 700px; object-fit: fill">
+
+
+### Спасибо за внимание!
+</div></script></section></div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/math/math.js"></script>
+	<script src="plugin/mermaid/mermaid.js"></script>
+	<script src="plugin/chart/chart.min.js"></script>
+	<script src="plugin/chart/plugin.js"></script>
+	<script src="plugin/menu/menu.js"></script>
+	<script src="plugin/customcontrols/plugin.js"></script>
+	<script src="plugin/reveal-pointer/pointer.js"></script>
+	<script src="plugin/elapsed-time-bar/elapsed-time-bar.js"></script>
+
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+	  function isLight(color) {
+		let hex = color.replace('#', '');
+
+		// convert #fff => #ffffff
+		if(hex.length == 3){
+			hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+		}
+
+		const c_r = parseInt(hex.substr(0, 2), 16);
+		const c_g = parseInt(hex.substr(2, 2), 16);
+		const c_b = parseInt(hex.substr(4, 2), 16);
+		const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+		return brightness > 155;
+	}
+
+	var bgColor = getComputedStyle(document.documentElement).getPropertyValue('--r-background-color').trim();
+	var isLight = isLight(bgColor);
+
+	if(isLight){
+		document.body.classList.add('has-light-background');
+	} else {
+		document.body.classList.add('has-dark-background');
+	}
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath.MathJax3,
+		  RevealMermaid,
+		  RevealChart,
+		  RevealCustomControls,
+		  RevealMenu,
+	      RevealPointer,
+		  ElapsedTimeBar
+        ],
+
+
+    	allottedTime: 120 * 1000,
+
+		mathjax3: {
+			mathjax: 'plugin/math/mathjax/tex-mml-chtml.js',
+		},
+		markdown: {
+		  gfm: true,
+		  mangle: true,
+		  pedantic: false,
+		  smartLists: false,
+		  smartypants: false,
+		},
+
+		mermaid: {
+			theme: isLight ? 'default' : 'dark',
+		},
+
+		customcontrols: {
+			controls: [
+			]
+		},
+		menu: {
+			loadIcons: false
+		}
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"width":1520,"height":980,"margin":0.04,"controls":true,"progress":true,"slideNumber":true,"showNotes":false,"transition":"slide","transitionSpeed":"normal"}, queryOptions);
+    </script>
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+
+  <!-- created with Advanced Slides -->
+</html>
