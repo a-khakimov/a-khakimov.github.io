@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Spend book page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    <script src="./js/dropDowns.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            const data = [
+                { date: '2024-09-17', value: 3 },
+                { date: '2024-09-18', value: 6 },
+                { date: '2024-09-19', value: 7 },
+                { date: '2024-09-20', value: 3 },
+                { date: '2024-09-21', value: 2 },
+                { date: '2024-09-22', value: 8 },
+                { date: '2024-09-23', value: 1 },
+            ];
+            const cal = new CalHeatmap();
+            cal.paint(
+                {
+                    itemSelector: '#cal-heatmap',
+                    //domain: { type: 'week', sort: 'asc' },
+                    //range: 3,
+                    source: data,
+                    date: {
+                        highlight: [
+                            new Date('2023-01-15'),
+                            new Date(), // Highlight today
+                        ],
+                    },
+                }
+            );
+
+            const mainButton = window.Telegram.WebApp.MainButton;
+            const searchParams = new URLSearchParams(window.location.search);
+            const chatId = searchParams.get("chatId");
+
+            const dropdownButton = $('.select-button')
+            const dropdownMenu = $('.select-options')
+            const dropdownInput = $('.hidden-input')
+
+            dropdownButton.on('click', function () {
+                dropdownMenu.toggleClass('select-options-visible');
+                $(this).toggleClass('dropdown__button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    dropdownButton.removeClass('dropdown__button_active');
+                    dropdownMenu.removeClass('select-options-visible');
+                }
+            })
+
+            fetch(`https://spendbook.ru/categories?chatId=${chatId}`)
+                .then((response) => response.json())
+                .then((userCategories) => {
+                    const finalCategories = ['Ввести свою категорию', ...userCategories];
+                    $.each(finalCategories, function (key, str) {
+                        if (str === 'Ввести свою категорию') {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}"><span>${str}</span></li>`
+                            )
+                        } else {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}">
+                                <span>${str}</span>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${str}">
+                                    <span class="checkmark"><b>🗑️</b></span>
+                                </label>
+                               </li>`
+                            )
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error(error);
+                    $.each(categories, function (key, str) {
+                        if (str === 'Ввести свою категорию') {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}"><span>${str}</span></li>`
+                            )
+                        } else {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}">
+                                <span>${str}</span>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${str}">
+                                    <span class="checkmark"><b>🗑️</b></span>
+                                </label>
+                               </li>`
+                            )
+                        }
+                    })
+
+                });
+
+            $(document).on('click', '.select-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-options .select-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                dropdownButton.html($(this).children('span').text())
+                dropdownInput.val($(this).attr('data-value'))
+                dropdownMenu.removeClass('select-options-visible')
+
+                if (dropdownInput.val() === 'Ввести свою категорию') {
+                    $(".custom-category").show();
+                } else {
+                    $(".custom-category").hide();
+                }
+
+                collectData()
+            });
+
+            $(document).on('click', '.checkbox-label', function (event) {
+                event.stopPropagation()
+
+                if ($(this).children('input').is(':checked')) {
+                    $(this).parent().css({ "text-decoration": "line-through" });
+                } else {
+                    $(this).parent().css({ "text-decoration": "inherit" });
+                }
+
+                if ($('input:checkbox[name=category-checkbox]:checked').length) {
+                    $('.select-options .select-option').each(function () {
+                        $(this).attr('disabled', true)
+                    })
+
+                    mainButton.text = "Подтвердить удаление";
+                    enableSubmit(true)
+                } else {
+                    $('.select-options .select-option').each(function () {
+                        $(this).attr('disabled', false)
+                    })
+
+                    enableSubmit(false)
+                }
+            })
+
+            function collectData() {
+                var category = $(".hidden-input").val();
+                if (category === 'Ввести свою категорию') {
+                    category = $("#custom_input").val();
+                }
+                const rawAmountValue = parseInt($("#amount").val(), 10);
+                const absAmountValue = Math.abs(rawAmountValue)
+                $("#amount").val(absAmountValue);
+                const data = {
+                    category: category,
+                    amount: absAmountValue,
+                    description: $("#text").val(),
+                    date: $("#date_input").val(),
+                    timeOffset: new Date().getTimezoneOffset(),
+                };
+                Object.keys(data).forEach(
+                    (key) =>
+                    (data[key] =
+                        data[key] === "any" || data[key] === "" ? null : data[key])
+                );
+                if (data.category && data.amount) {
+                    mainButton.text = "Отправить";
+                    enableSubmit(true);
+                } else {
+                    enableSubmit(false);
+                }
+                return data;
+            }
+
+            function formatDate(date) {
+                var d = new Date(date),
+                    month = "" + (d.getMonth() + 1),
+                    day = "" + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2) month = "0" + month;
+                if (day.length < 2) day = "0" + day;
+
+                return [year, month, day].join("-");
+            }
+
+            $("#date_input").val(formatDate(new Date()));
+
+            $("#custom_input").on("input", collectData);
+            $("#amount").on("input", collectData);
+            $("#date_input").on("change", collectData);
+
+            mainButton.enable();
+            mainButton.onClick(function () {
+                const checkboxes = $('input:checkbox[name=category-checkbox]:checked')
+
+                if (checkboxes.length) {
+                    const arr = []
+
+                    checkboxes.each(function () {
+                        arr.push($(this).val())
+                    });
+
+                    window.Telegram.WebApp.sendData(JSON.stringify(arr));
+                } else {
+                    window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+                }
+            });
+
+            function enableSubmit(activate) {
+                if (activate) {
+                    mainButton.show();
+                } else {
+                    mainButton.hide();
+                }
+            }
+        });
+    </script>
+</head>
+
+<body>
+
+    <div id="cal-heatmap"></div>
+
+    <dotlottie-player src="https://lottie.host/31eb8f50-5493-47de-939a-adffa6bd4317/wbaxE0xVId.json"
+        background="transparent" speed="1" style="width: 100%; height: 100px; text-align: center;" loop
+        autoplay></dotlottie-player>
+
+    <form class="form">
+        <div class="field-wrapper">
+            <span class="label">Категория</span>
+            <button class="select-button" type="button">Категория</button>
+        </div>
+        <ul id="custom-dropdown" class="select-options"></ul>
+
+        <label class="hidden-input-label" for="select-value">
+            <input id="select-value" class="hidden-input" type="text" name="select-category" value="" />
+        </label>
+
+        <div class="field-wrapper custom-category">
+            <label id="custom_label" for="custom_input" class="label">Своя категория</label>
+            <input id="custom_input" type="text" name="custom" placeholder="Своя категория" class="text-field" />
+        </div>
+
+        <div class="field-wrapper">
+            <label for="amount" class="label">Сумма траты</label>
+            <input type="number" id="amount" name="amount" placeholder="Сумма" class="text-field" />
+        </div>
+
+        <div class="field-wrapper">
+            <label for="text" class="label">Комментарий</label>
+            <textarea id="text" name="text" placeholder="Комментарий" rows="3" class="text-field"></textarea>
+        </div>
+
+        <div class="field-wrapper">
+            <label for="amount" class="label">Дата</label>
+            <input type="date" id="date_input" class="text-field">
+        </div>
+    </form>
+</body>
+
+</html>
