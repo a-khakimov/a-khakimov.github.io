@@ -137,6 +137,104 @@
                 collectData()
             });
 
+            // Select unit button
+
+            const unitButton = $('.select-unit-button')
+            const unitMenu = $('.select-unit-options')
+            const unitInput = $('.hidden-unit-input')
+
+            unitButton.on('click', function () {
+                unitMenu.toggleClass('select-unit-options-visible');
+                $(this).toggleClass('dropdown_unit_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    amountButton.removeClass('dropdown_unit_button_active');
+                    amountMenu.removeClass('select-unit-options-visible');
+                }
+            })
+
+            const units = [ "Раз", "Минута", "Час", "Метр", "Километр", "Литр", "Грамм", "Килограмм" ]
+            $.each(units, function (key, str) {
+                console.log(str)
+                $('#unit-dropdown').append(
+                    `<li class="select-unit-option" data-value="${str}">
+                        <span>${str}</span>
+                    </li>`
+                )
+            })
+
+            $(document).on('click', '.select-unit-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-unit-options .select-unit-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                unitButton.html($(this).children('span').text())
+                unitInput.val($(this).attr('data-value'))
+                unitMenu.removeClass('select-unit-options-visible')
+
+                collectData()
+            });
+
+            // Select period button
+
+            const periodButton = $('.select-period-button')
+            const periodMenu = $('.select-period-options')
+            const periodInput = $('.hidden-period-input')
+
+            periodButton.on('click', function () {
+                periodMenu.toggleClass('select-period-options-visible');
+                $(this).toggleClass('dropdown_period_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    periodButton.removeClass('dropdown_period_button_active');
+                    periodMenu.removeClass('select-period-options-visible');
+                }
+            })
+
+            const periods = [ "В день", "В неделю", "В месяц"]
+            $.each(periods, function (key, str) {
+                console.log(str)
+                $('#period-dropdown').append(
+                    `<li class="select-period-option" data-value="${str}">
+                        <span>${str}</span>
+                    </li>`
+                )
+            })
+
+            $(document).on('click', '.select-period-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-period-options .select-period-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                periodButton.html($(this).children('span').text())
+                periodInput.val($(this).attr('data-value'))
+                periodMenu.removeClass('select-period-options-visible')
+
+                collectData()
+            });
+
+            // Other
+
             function collectData() {
                 var category = $(".hidden-habit-input").val();
                 if (category === 'Ввести свою категорию') {
@@ -228,23 +326,28 @@
             <input id="custom_input" type="text" name="custom" placeholder="Название" class="text-field" />
         </div>
 
-        <label class="label">Цель</label>
+
         <div class="field-wrapper">
-            <button class="select-amount-button" type="button">12</button>
-        </div>
+        <label class="label">Цель</label>
+
+        <button class="select-amount-button" type="button">1</button>
         <ul id="amount-dropdown" class="select-amount-options"></ul>
         <label class="hidden-amount-input-label" for="select-amount-value">
             <input id="select-amount-value" class="hidden-amount-input" type="text" name="select-amount" value="" />
         </label>
 
-        <div class="field-wrapper">
-            <button class="select-unit-button" type="button">раз</button>
-        </div>
+        <button class="select-unit-button" type="button">Раз</button>
+        <ul id="unit-dropdown" class="select-unit-options"></ul>
+        <label class="hidden-unit-input-label" for="select-unit-value">
+            <input id="select-unit-value" class="hidden-unit-input" type="text" name="select-unit" value="" />
+        </label>
 
-        <div class="field-wrapper">
             <button class="select-period-button" type="button">В день</button>
+            <ul id="period-dropdown" class="select-period-options"></ul>
+            <label class="hidden-period-input-label" for="select-period-value">
+                <input id="select-period-value" class="hidden-period-input" type="text" name="select-period" value="" />
+            </label>
         </div>
-
         <div class="field-wrapper">
             <label for="text" class="label">Комментарий</label>
             <textarea id="text" name="text" placeholder="Комментарий" rows="3" class="text-field"></textarea>

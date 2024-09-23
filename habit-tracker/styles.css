@@ -191,6 +191,172 @@ body {
     text-decoration: underline;
 }
 
+/* Unit */
+.custom-unit {
+    display: none;
+}
+
+.select-unit-button {
+    background-color: var(--tg-theme-secondary-bg-color);
+    font-size: 18px;
+    color: var(--tg-theme-text-color);
+    text-align: left;
+
+    width: 100%;
+    margin: 0;
+    padding: 10px 20px;
+
+    border: none;
+    border-radius: 8px;
+}
+
+.hidden-unit-input-label {
+    display: none;
+}
+
+.select-unit-options {
+    background-color: var(--tg-theme-bg-color);
+    /*background-color: #fff;*/
+
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+
+    margin: 0;
+    padding: 20px;
+
+    list-style: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: 200ms ease;
+
+    z-index: 10;
+}
+
+.select-unit-options-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.select-unit-option {
+    background-color: var(--tg-theme-secondary-bg-color);
+    /*background-color: #f4f4f5;*/
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--tg-theme-bg-color);
+    cursor: pointer;
+}
+
+.select-unit-option:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.select-unit-option:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.select-unit-option.selected {
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color)
+}
+
+.select-unit-option input:checked {
+    text-decoration: underline;
+}
+
+/* Period */
+.custom-period {
+    display: none;
+}
+
+.select-period-button {
+    background-color: var(--tg-theme-secondary-bg-color);
+    font-size: 18px;
+    color: var(--tg-theme-text-color);
+    text-align: left;
+
+    width: 100%;
+    margin: 0;
+    padding: 10px 20px;
+
+    border: none;
+    border-radius: 8px;
+}
+
+.hidden-period-input-label {
+    display: none;
+}
+
+.select-period-options {
+    background-color: var(--tg-theme-bg-color);
+    /*background-color: #fff;*/
+
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+
+    margin: 0;
+    padding: 20px;
+
+    list-style: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: 200ms ease;
+
+    z-index: 10;
+}
+
+.select-period-options-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.select-period-option {
+    background-color: var(--tg-theme-secondary-bg-color);
+    /*background-color: #f4f4f5;*/
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--tg-theme-bg-color);
+    cursor: pointer;
+}
+
+.select-period-option:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.select-period-option:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.select-period-option.selected {
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color)
+}
+
+.select-period-option input:checked {
+    text-decoration: underline;
+}
+
 .text-field {
     background-color: var(--tg-theme-secondary-bg-color);
 
