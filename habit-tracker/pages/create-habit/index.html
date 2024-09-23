@@ -31,6 +31,7 @@
             const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
 
+            // Select habit button
             const dropdownButton = $('.select-habit-button')
             const dropdownMenu = $('.select-habit-options')
             const dropdownInput = $('.hidden-habit-input')
@@ -83,6 +84,55 @@
                 } else {
                     $(".custom-habit").hide();
                 }
+
+                collectData()
+            });
+
+
+            // Select amount button
+
+            const amountButton = $('.select-amount-button')
+            const amountMenu = $('.select-amount-options')
+            const amountInput = $('.hidden-amount-input')
+
+            amountButton.on('click', function () {
+                amountMenu.toggleClass('select-amount-options-visible');
+                $(this).toggleClass('dropdown_amount_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    amountButton.removeClass('dropdown_amount_button_active');
+                    amountMenu.removeClass('select-amount-options-visible');
+                }
+            })
+
+            const amounts = [ "1", "2", "3", "4" ]
+            $.each(amounts, function (key, str) {
+                console.log(str)
+                $('#amount-dropdown').append(
+                    `<li class="select-amount-option" data-value="${str}">
+                        <span>${str}</span>
+                    </li>`
+                )
+            })
+
+            $(document).on('click', '.select-amount-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-amount-options .select-amount-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                amountButton.html($(this).children('span').text())
+                amountInput.val($(this).attr('data-value'))
+                amountMenu.removeClass('select-amount-options-visible')
 
                 collectData()
             });
@@ -180,8 +230,18 @@
 
         <label class="label">Цель</label>
         <div class="field-wrapper">
-            <button class="select-amount-button" type="button">1</button>
+            <button class="select-amount-button" type="button">12</button>
+        </div>
+        <ul id="amount-dropdown" class="select-amount-options"></ul>
+        <label class="hidden-amount-input-label" for="select-amount-value">
+            <input id="select-amount-value" class="hidden-amount-input" type="text" name="select-amount" value="" />
+        </label>
+
+        <div class="field-wrapper">
             <button class="select-unit-button" type="button">раз</button>
+        </div>
+
+        <div class="field-wrapper">
             <button class="select-period-button" type="button">В день</button>
         </div>
 
