@@ -15,36 +15,59 @@
     <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
     <script>
+            const habits = [
+                "Отжимание",
+                "Пение",
+                "Медитация",
+                "Ходить в зал",
+
+                // Должно быть последним
+                "Создать новую привычку"
+            ]
+
         $(document).ready(function () {
 
             const mainButton = window.Telegram.WebApp.MainButton;
             const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
 
-            const dropdownButton = $('.select-button')
-            const dropdownMenu = $('.select-options')
-            const dropdownInput = $('.hidden-input')
+            const dropdownButton = $('.select-habit-button')
+            const dropdownMenu = $('.select-habit-options')
+            const dropdownInput = $('.hidden-habit-input')
 
             dropdownButton.on('click', function () {
-                dropdownMenu.toggleClass('select-options-visible');
-                $(this).toggleClass('dropdown__button_active');
+                console.log("Click dropdownButton")
+                dropdownMenu.toggleClass('select-habit-options-visible');
+                $(this).toggleClass('dropdown_habit_button_active');
             });
 
             $(document).on('keydown', function (e) {
                 if (e.key === 'Tab' || e.key === 'Escape') {
-                    dropdownButton.removeClass('dropdown__button_active');
-                    dropdownMenu.removeClass('select-options-visible');
+                    dropdownButton.removeClass('dropdown_habit_button_active');
+                    dropdownMenu.removeClass('select-habit-options-visible');
                 }
             })
 
+            $.each(habits, function (key, str) {
+                console.log(str)
+                if (str === 'Создать новую привычку') {
+                    $('#habit-dropdown').append(`<li class="select-habit-option" data-value="${str}"><span>${str}</span></li>`)
+                } else {
+                    $('#habit-dropdown').append(
+                        `<li class="select-habit-option" data-value="${str}">
+                            <span>${str}</span>
+                        </li>`
+                    )
+                }
+            })
 
-            $(document).on('click', '.select-option', function (event) {
+            $(document).on('click', '.select-habit-option', function (event) {
                 if ($(this).attr('disabled')) {
                     event.preventDefault()
                     return false
                 }
 
-                $('.select-options .select-option').each(function () {
+                $('.select-habit-options .select-habit-option').each(function () {
                     if ($(this).hasClass('selected')) {
                         $(this).removeClass('selected')
                     }
@@ -53,44 +76,19 @@
                 $(this).addClass('selected')
                 dropdownButton.html($(this).children('span').text())
                 dropdownInput.val($(this).attr('data-value'))
-                dropdownMenu.removeClass('select-options-visible')
+                dropdownMenu.removeClass('select-habit-options-visible')
 
-                if (dropdownInput.val() === 'Ввести свою категорию') {
-                    $(".custom-category").show();
+                if (dropdownInput.val() === 'Создать новую привычку') {
+                    $(".custom-habit").show();
                 } else {
-                    $(".custom-category").hide();
+                    $(".custom-habit").hide();
                 }
 
                 collectData()
             });
 
-            $(document).on('click', '.checkbox-label', function (event) {
-                event.stopPropagation()
-
-                if ($(this).children('input').is(':checked')) {
-                    $(this).parent().css({ "text-decoration": "line-through" });
-                } else {
-                    $(this).parent().css({ "text-decoration": "inherit" });
-                }
-
-                if ($('input:checkbox[name=category-checkbox]:checked').length) {
-                    $('.select-options .select-option').each(function () {
-                        $(this).attr('disabled', true)
-                    })
-
-                    mainButton.text = "Подтвердить удаление";
-                    enableSubmit(true)
-                } else {
-                    $('.select-options .select-option').each(function () {
-                        $(this).attr('disabled', false)
-                    })
-
-                    enableSubmit(false)
-                }
-            })
-
             function collectData() {
-                var category = $(".hidden-input").val();
+                var category = $(".hidden-habit-input").val();
                 if (category === 'Ввести свою категорию') {
                     category = $("#custom_input").val();
                 }
@@ -130,7 +128,7 @@
                 return [year, month, day].join("-");
             }
 
-            $("#date_input").val(formatDate(new Date()));
+            //$("#date_input").val(formatDate(new Date()));
 
             $("#custom_input").on("input", collectData);
             $("#amount").on("input", collectData);
@@ -138,19 +136,7 @@
 
             mainButton.enable();
             mainButton.onClick(function () {
-                const checkboxes = $('input:checkbox[name=category-checkbox]:checked')
-
-                if (checkboxes.length) {
-                    const arr = []
-
-                    checkboxes.each(function () {
-                        arr.push($(this).val())
-                    });
-
-                    window.Telegram.WebApp.sendData(JSON.stringify(arr));
-                } else {
-                    window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
-                }
+                window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
 
             function enableSubmit(activate) {
@@ -179,12 +165,12 @@
     <form class="form">
         <div class="field-wrapper">
             <span class="label">Выбрать привычку</span>
-            <button class="select-button" type="button">Привычка</button>
+            <button class="select-habit-button" type="button">Привычка</button>
         </div>
-        <ul id="custom-dropdown" class="select-options"></ul>
+        <ul id="habit-dropdown" class="select-habit-options"></ul>
 
-        <label class="hidden-input-label" for="select-value">
-            <input id="select-value" class="hidden-input" type="text" name="select-habit" value="" />
+        <label class="hidden-habit-input-label" for="select-habit-value">
+            <input id="select-habit-value" class="hidden-habit-input" type="text" name="select-habit" value="" />
         </label>
 
         <div class="field-wrapper custom-habit">
@@ -192,11 +178,11 @@
             <input id="custom_input" type="text" name="custom" placeholder="Название" class="text-field" />
         </div>
 
+        <label class="label">Цель</label>
         <div class="field-wrapper">
-            <label for="amount" class="label">Цель</label>
-            <button class="select-button" type="button">1</button>
-            <button class="select-button" type="button">раз</button>
-            <button class="select-button" type="button">В день</button>
+            <button class="select-amount-button" type="button">1</button>
+            <button class="select-unit-button" type="button">раз</button>
+            <button class="select-period-button" type="button">В день</button>
         </div>
 
         <div class="field-wrapper">

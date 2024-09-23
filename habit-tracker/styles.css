@@ -23,11 +23,11 @@ body {
     padding-bottom: 5px;
 }
 
-.custom-category {
+.custom-habit {
     display: none;
 }
 
-.select-button {
+.select-habit-button {
     background-color: var(--tg-theme-secondary-bg-color);
     font-size: 18px;
     color: var(--tg-theme-text-color);
@@ -41,11 +41,11 @@ body {
     border-radius: 8px;
 }
 
-.hidden-input-label {
+.hidden-habit-input-label {
     display: none;
 }
 
-.select-options {
+.select-habit-options {
     background-color: var(--tg-theme-bg-color);
     /*background-color: #fff;*/
 
@@ -69,12 +69,12 @@ body {
     z-index: 10;
 }
 
-.select-options-visible {
+.select-habit-options-visible {
     opacity: 1;
     visibility: visible;
 }
 
-.select-option {
+.select-habit-option {
     background-color: var(--tg-theme-secondary-bg-color);
     /*background-color: #f4f4f5;*/
 
@@ -86,22 +86,22 @@ body {
     cursor: pointer;
 }
 
-.select-option:first-child {
+.select-habit-option:first-child {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
 
-.select-option:last-child {
+.select-habit-option:last-child {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
 
-.select-option.selected {
+.select-habit-option.selected {
     background-color: var(--tg-theme-button-color);
     color: var(--tg-theme-button-text-color)
 }
 
-.select-option input:checked {
+.select-habit-option input:checked {
     text-decoration: underline;
 }
 

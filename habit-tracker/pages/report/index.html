@@ -28,19 +28,19 @@
               const searchParams = new URLSearchParams(window.location.search);
               const chatId = searchParams.get("chatId");
 
-              const dropdownInput = $('.hidden-input');
+              const dropdownInput = $('.hidden-habit-input');
               let categoriesFromServer;
 
               $('.custom-select').each(function () {
-                  const dropdownButton = $(this).children('.field-wrapper').children('.select-button');
-                  const dropdownMenu = $(this).children('.select-options');
+                  const dropdownButton = $(this).children('.field-wrapper').children('.select-habit-button');
+                  const dropdownMenu = $(this).children('.select-habit-options');
 
                   dropdownButton.on('click', function () {
-                      dropdownMenu.toggleClass('select-options-visible');
-                      $(this).toggleClass('dropdown__button_active');
+                      dropdownMenu.toggleClass('select-habit-options-visible');
+                      $(this).toggleClass('dropdown_habit_button_active');
                   });
 
-                  if (dropdownMenu.attr('id') === 'custom-dropdown') {
+                  if (dropdownMenu.attr('id') === 'habit-dropdown') {
                       dropdownInput.val(new Date().getMonth()+1);
 
                       const m = new Date().getMonth()+1
@@ -48,7 +48,7 @@
                       dropdownButton.html(currentMonth.text)
 
                       $.each(months, function (key, obj) {
-                          dropdownMenu.append(`<li class="select-option" value="${obj.value}">${obj.text}</li>`);
+                          dropdownMenu.append(`<li class="select-habit-option" value="${obj.value}">${obj.text}</li>`);
                       });
                   }
 
@@ -60,7 +60,7 @@
 
                               $.each(userCategories, function (key, str) {
                                   dropdownMenu.append(
-                                      `<li class="select-option" value="${str}">
+                                      `<li class="select-habit-option" value="${str}">
                                         ${str}
                                        </li>`
                                   )
@@ -73,15 +73,15 @@
                               $.each(categories, function (key, str) {
                                   if (str !== 'Ввести свою категорию') {
                                       dropdownMenu.append(
-                                          `<li class="select-option" value="${str}">${str}</li>`
+                                          `<li class="select-habit-option" value="${str}">${str}</li>`
                                       )
                                   }
                               })
                           });
                   }
 
-                  dropdownMenu.on('click', '.select-option', function() {
-                      dropdownMenu.children('.select-option').each(function (){
+                  dropdownMenu.on('click', '.select-habit-option', function() {
+                      dropdownMenu.children('.select-habit-option').each(function (){
                           if ($(this).hasClass('selected')) {
                               $(this).removeClass('selected')
                           }
@@ -90,7 +90,7 @@
                       $(this).addClass('selected')
                       dropdownButton.html($(this).text())
                       dropdownInput.val($(this).attr('value'))
-                      dropdownMenu.removeClass('select-options-visible')
+                      dropdownMenu.removeClass('select-habit-options-visible')
 
                       collectData();
                   });
@@ -98,8 +98,8 @@
 
                   $(document).on('keydown', function (e) {
                       if( e.key === 'Tab' || e.key === 'Escape' ) {
-                          dropdownButton.removeClass('dropdown__button_active');
-                          dropdownMenu.removeClass('select-options-visible');
+                          dropdownButton.removeClass('dropdown_habit_button_active');
+                          dropdownMenu.removeClass('select-habit-options-visible');
                       }
                   })
               });
@@ -183,21 +183,21 @@
     <div class="custom-select month-select">
         <div class="field-wrapper">
             <span class="label">Месяц</span>
-            <button class="select-button" type="button">Месяц</button>
+            <button class="select-habit-button" type="button">Месяц</button>
         </div>
-        <ul id="custom-dropdown" class="select-options"></ul>
+        <ul id="habit-dropdown" class="select-habit-options"></ul>
     </div>
 
       <div class="custom-select category-select">
           <div class="field-wrapper">
               <span class="label">Категория</span>
-              <button class="select-button" type="button">Категория</button>
+              <button class="select-habit-button" type="button">Категория</button>
           </div>
-          <ul id="category-dropdown" class="select-options"></ul>
+          <ul id="category-dropdown" class="select-habit-options"></ul>
       </div>
 
-    <label class="hidden-input-label" for="select-value">
-      <input id="select-value" class="hidden-input" type="text" name="select-category" value=""/>
+    <label class="hidden-habit-input-label" for="select-habit-value">
+      <input id="select-habit-value" class="hidden-habit-input" type="text" name="select-category" value=""/>
     </label>
 
       <div class="field-wrapper">
