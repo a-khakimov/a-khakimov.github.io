@@ -253,18 +253,21 @@
                 const rawAmountValue = parseInt($("#amount").val(), 10);
                 const absAmountValue = Math.abs(rawAmountValue)
                 $("#amount").val(absAmountValue);
+                const unit = $(".hidden-unit-input").val();
+                const period = $(".hidden-period-input").val();
+
                 const data = {
-                    habit: habit,
+                    habitName: habit,
                     amount: absAmountValue,
+                    unit: unit,
+                    period: period,
                     description: $("#text").val(),
                     timeOffset: new Date().getTimezoneOffset(),
                 };
                 Object.keys(data).forEach(
-                    (key) =>
-                    (data[key] =
-                        data[key] === "any" || data[key] === "" ? null : data[key])
+                    (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
                 );
-                if (data.habit && data.amount) {
+                if (data.habit && data.amount && data.unit && data.period) {
                     mainButton.text = "Отправить";
                     enableSubmit(true);
                 } else {
