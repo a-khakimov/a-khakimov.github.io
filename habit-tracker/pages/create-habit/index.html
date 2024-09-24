@@ -28,8 +28,18 @@
         $(document).ready(function () {
 
             const mainButton = window.Telegram.WebApp.MainButton;
+            const initData = window.Telegram.WebApp.initData;
             const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
+
+            console.log("init data: " + initData)
+            let paramObj = {};
+            for(var value of searchParams.keys()) {
+                paramObj[value] = searchParams.get(value);
+                console.log(value + " - " + searchParams.get(value))
+                $("#text").val() = $("#text").val() + value + " - " + searchParams.get(value)
+            }
+            
 
             // Select habit button
             const dropdownButton = $('.select-habit-button')
