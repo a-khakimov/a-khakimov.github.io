@@ -253,8 +253,8 @@
                 const rawAmountValue = parseInt($("#amount").val(), 10);
                 const absAmountValue = Math.abs(rawAmountValue)
                 $("#amount").val(absAmountValue);
-                const unit = $(".hidden-unit-input").val();
-                const period = $(".hidden-period-input").val();
+                const unit = unitInput.val();
+                const period = periodInput.val();
 
                 const data = {
                     habitName: habit,
@@ -267,7 +267,7 @@
                 Object.keys(data).forEach(
                     (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
                 );
-                if (data.habit && data.amount && data.unit && data.period) {
+                if (data.habitName && data.amount && data.unit && data.period) {
                     mainButton.text = "Отправить";
                     enableSubmit(true);
                 } else {
