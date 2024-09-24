@@ -236,18 +236,17 @@
             // Other
 
             function collectData() {
-                var category = $(".hidden-habit-input").val();
-                if (category === 'Ввести свою категорию') {
-                    category = $("#custom_input").val();
+                var habit = $(".hidden-habit-input").val();
+                if (habit === 'Создать новую привычку') {
+                    habit = $("#custom_input").val();
                 }
                 const rawAmountValue = parseInt($("#amount").val(), 10);
                 const absAmountValue = Math.abs(rawAmountValue)
                 $("#amount").val(absAmountValue);
                 const data = {
-                    category: category,
+                    habit: habit,
                     amount: absAmountValue,
                     description: $("#text").val(),
-                    date: $("#date_input").val(),
                     timeOffset: new Date().getTimezoneOffset(),
                 };
                 Object.keys(data).forEach(
@@ -255,7 +254,7 @@
                     (data[key] =
                         data[key] === "any" || data[key] === "" ? null : data[key])
                 );
-                if (data.category && data.amount) {
+                if (data.habit && data.amount) {
                     mainButton.text = "Отправить";
                     enableSubmit(true);
                 } else {
@@ -276,11 +275,8 @@
                 return [year, month, day].join("-");
             }
 
-            //$("#date_input").val(formatDate(new Date()));
-
             $("#custom_input").on("input", collectData);
             $("#amount").on("input", collectData);
-            $("#date_input").on("change", collectData);
 
             mainButton.enable();
             mainButton.onClick(function () {
@@ -288,6 +284,7 @@
             });
 
             function enableSubmit(activate) {
+                console.log("enableSubmit: " + activate)
                 if (activate) {
                     mainButton.show();
                 } else {
@@ -328,20 +325,31 @@
 
 
         <div class="field-wrapper">
-        <label class="label">Цель</label>
+            <label class="label">Цель</label>
+        </div>
 
+        <div class="field-wrapper">
+            <label for="amount" class="label">Сумма траты</label>
+            <input type="number" id="amount" name="amount" placeholder="Сумма" class="text-field" />
+        </div>
+
+        <!--
         <button class="select-amount-button" type="button">1</button>
         <ul id="amount-dropdown" class="select-amount-options"></ul>
         <label class="hidden-amount-input-label" for="select-amount-value">
             <input id="select-amount-value" class="hidden-amount-input" type="text" name="select-amount" value="" />
         </label>
+        -->
 
+        <div class="field-wrapper">
         <button class="select-unit-button" type="button">Раз</button>
         <ul id="unit-dropdown" class="select-unit-options"></ul>
         <label class="hidden-unit-input-label" for="select-unit-value">
             <input id="select-unit-value" class="hidden-unit-input" type="text" name="select-unit" value="" />
         </label>
+        </div>
 
+        <div class="field-wrapper">
             <button class="select-period-button" type="button">В день</button>
             <ul id="period-dropdown" class="select-period-options"></ul>
             <label class="hidden-period-input-label" for="select-period-value">
