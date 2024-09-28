@@ -58,15 +58,11 @@
 
             $.each(habits, function (key, str) {
                 console.log(str)
-                if (str === 'Создать новую привычку') {
-                    $('#habit-dropdown').append(`<li class="select-habit-option" data-value="${str}"><span>${str}</span></li>`)
-                } else {
                     $('#habit-dropdown').append(
                         `<li class="select-habit-option" data-value="${str}">
                             <span>${str}</span>
                         </li>`
                     )
-                }
             })
 
             $(document).on('click', '.select-habit-option', function (event) {
@@ -85,12 +81,6 @@
                 dropdownButton.html($(this).children('span').text())
                 dropdownInput.val($(this).attr('data-value'))
                 dropdownMenu.removeClass('select-habit-options-visible')
-
-                if (dropdownInput.val() === 'Создать новую привычку') {
-                    $(".custom-habit").show();
-                } else {
-                    $(".custom-habit").hide();
-                }
 
                 collectData()
             });
@@ -306,10 +296,7 @@
 </head>
 
 <body>
-    <!--
-    <div id="cal-heatmap"></div>
-    -->
-    <dotlottie-player src="../../images/bicycle.json"
+    <dotlottie-player src="../../images/write.json"
         background="transparent"
         speed="1"
         style="width: 100%; height: 100px; text-align: center;"
@@ -328,19 +315,13 @@
             <input id="select-habit-value" class="hidden-habit-input" type="text" name="select-habit" value="" />
         </label>
 
-        <div class="field-wrapper custom-habit">
-            <label id="custom_label" for="custom_input" class="label">Новая привычка</label>
-            <input id="custom_input" type="text" name="custom" placeholder="Название" class="text-field" />
-        </div>
-
-
         <div class="field-wrapper">
-            <label class="label">Цель</label>
+            <label class="label">Прогресс</label>
         </div>
 
         <div class="field-wrapper">
             <label for="amount" class="label"></label>
-            <input type="number" id="amount" name="amount" placeholder="Количество" class="text-field" />
+            <input type="number" id="amount" name="amount" placeholder="Число" class="text-field" />
         </div>
 
         <div class="field-wrapper">
@@ -350,17 +331,10 @@
             <input id="select-unit-value" class="hidden-unit-input" type="text" name="select-unit" value="" />
         </label>
         </div>
-
-        <div class="field-wrapper">
-            <button class="select-period-button" type="button">Период</button>
-            <ul id="period-dropdown" class="select-period-options"></ul>
-            <label class="hidden-period-input-label" for="select-period-value">
-                <input id="select-period-value" class="hidden-period-input" type="text" name="select-period" value="" />
-            </label>
         </div>
         <div class="field-wrapper">
             <label for="text" class="label">Комментарий</label>
-            <textarea id="text" name="text" placeholder="Комментарий" rows="3" class="text-field"></textarea>
+            <textarea id="text" name="text" placeholder="Сделать заметку" rows="3" class="text-field"></textarea>
         </div>
     </form>
 </body>
