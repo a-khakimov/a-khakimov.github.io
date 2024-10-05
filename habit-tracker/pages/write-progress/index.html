@@ -243,7 +243,7 @@
                 Object.keys(data).forEach(
                     (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
                 );
-                if (data.habitId && data.amount && data.unitId) {
+                if (data.habitId && data.progressValue && data.unitId) {
                     mainButton.text = "Отправить";
                     enableSubmit(true);
                 } else {
