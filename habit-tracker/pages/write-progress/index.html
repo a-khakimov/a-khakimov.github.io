@@ -225,10 +225,6 @@
 
             // Other
 
-            $("#date_input").val(formatDate(new Date()));
-            $("#date_input").on("change", collectData);
-
-
             function collectData() {
                 var habitName = $(".hidden-habit-input").val();
                 const rawAmountValue = parseInt($("#amount").val(), 10);
@@ -239,7 +235,7 @@
 
                 const data = {
                     habitId: userHabits.get(habitName).id,
-                    amount: absAmountValue,
+                    progressValue: absAmountValue,
                     unitId: unitId,
                     date: date,
                     description: $("#text").val(),
@@ -273,6 +269,9 @@
 
             $("#custom_input").on("input", collectData);
             $("#amount").on("input", collectData);
+            $("#text").on("input", collectData);
+            $("#date_input").val(formatDate(new Date()));
+            $("#date_input").on("change", collectData);
 
             mainButton.enable();
             mainButton.onClick(function () {
