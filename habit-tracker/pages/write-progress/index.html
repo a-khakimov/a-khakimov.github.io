@@ -132,16 +132,6 @@
                 }
             })
 
-            const amounts = [ "1", "2", "3", "4" ]
-            $.each(amounts, function (key, str) {
-                console.log(str)
-                $('#amount-dropdown').append(
-                    `<li class="select-amount-option" data-value="${str}">
-                        <span>${str}</span>
-                    </li>`
-                )
-            })
-
             $(document).on('click', '.select-amount-option', function (event) {
                 if ($(this).attr('disabled')) {
                     event.preventDefault()
@@ -244,7 +234,7 @@
                     (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
                 );
                 if (data.habitId && data.progressValue && data.unitId) {
-                    mainButton.text = "Отправить";
+                    mainButton.text = "Записать";
                     enableSubmit(true);
                 } else {
                     enableSubmit(false);
