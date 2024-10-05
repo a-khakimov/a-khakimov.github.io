@@ -220,7 +220,7 @@
                 const rawAmountValue = parseInt($("#amount").val(), 10);
                 const absAmountValue = Math.abs(rawAmountValue)
                 $("#amount").val(absAmountValue);
-                const unitId = unitInput.val();
+                const unitId = getKeyByValue(units, unitInput.val());
                 const date = $("#date_input").val();
 
                 const data = {
@@ -243,6 +243,16 @@
                 console.log(data)
 
                 return data;
+            }
+
+            function getKeyByValue(map, searchValue) {
+                let foundKey = null;
+                map.forEach((value, key) => {
+                    if (value === searchValue) {
+                        foundKey = key;
+                    }
+                });
+                return foundKey;
             }
 
             function formatDate(date) {
