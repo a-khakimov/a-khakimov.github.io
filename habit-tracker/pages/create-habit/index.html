@@ -15,37 +15,24 @@
     <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
     <script>
-            const habits = [
-                "Отжимание",
-                "Пение",
-                "Медитация",
-                "Ходить в зал",
+        
+        // todo: fetch from backend
+        const habits = [
+            "Отжимание",
+            "Пение",
+            "Медитация",
+            "Ходить в зал",
 
-                // Должно быть последним
-                "Создать новую привычку"
-            ]
+            // Должно быть последним
+            "Создать новую привычку"
+        ]
 
         $(document).ready(function () {
 
             const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
             const mainButton = window.Telegram.WebApp.MainButton;
-            const initData = window.Telegram.WebApp.initData;
-            const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
             const userId = searchParams.get("userId");
-
-            const params = new URLSearchParams(Telegram.WebApp.initData);
-            const userData = Object.fromEntries(params);
-
-            console.log("initData")
-            console.log(params)
-            console.log(userData)
-
-            let paramObj = {};
-            for(var value of params.keys()) {
-                paramObj[value] = params.get(value);
-                console.log(value + " - " + params.get(value))
-            }
             
             // Select habit button
             const dropdownButton = $('.select-habit-button')
