@@ -27,18 +27,19 @@
 
         $(document).ready(function () {
 
+            const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
             const mainButton = window.Telegram.WebApp.MainButton;
             const initData = window.Telegram.WebApp.initData;
             const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
+            const userId = searchParams.get("userId");
 
-            console.log("init data: " + initData)
-            let paramObj = {};
-            for(var value of searchParams.keys()) {
-                paramObj[value] = searchParams.get(value);
-                console.log(value + " - " + searchParams.get(value))
-                $("#text").val() = $("#text").val() + value + " - " + searchParams.get(value)
-            }
+            //let paramObj = {};
+            //for(var value of searchParams.keys()) {
+            //    paramObj[value] = searchParams.get(value);
+            //    console.log(value + " - " + searchParams.get(value))
+            //    $("#text").val() = $("#text").val() + value + " - " + searchParams.get(value)
+            //}
             
             // Select habit button
             const dropdownButton = $('.select-habit-button')
@@ -164,39 +165,26 @@
                 }
             })
 
-            const units = [ "Раз", "Минута", "Час", "Метр", "Километр", "Литр", "Грамм", "Килограмм" ]
-
-
-            //const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
-            const apiUrl = "http://localhost:8080"
-
+            let units = new Map();
+            
             fetch(`${apiUrl}/api/habit/units/${userId}`)
                 .then((response) => response.json())
-                .then((response) => {
-                    response
-
-                    $.each(userHabits, function (key, str) {
-                        const habitName = str['name']
-                        $('#habit-dropdown').append(
-                            `<li class="select-habit-option" data-value="${habitName}">
-                                <span>${habitName}</span>
-                            </li>`
-                        )
-                    })
+                .then((data) => {
+                    $.each(data.payload, function(index, category) {
+                        $.each(category.units, function(i, unit) {
+                            units.set(unit.name, unit.id);
+                            console.log(unit.name);
+                            $('#unit-dropdown').append(
+                                `<li class="select-unit-option" data-value="${unit.name}">
+                                    <span>${unit.name}</span>
+                                </li>`
+                            );
+                        });
+                    });
                 })
                 .catch((error) => {
-                    console.error(error)
-                    ["???"]
-                );
-
-            $.each(units, function (key, str) {
-                console.log(str)
-                $('#unit-dropdown').append(
-                    `<li class="select-unit-option" data-value="${str}">
-                        <span>${str}</span>
-                    </li>`
-                )
-            })
+                    console.error(error);
+                });
 
             $(document).on('click', '.select-unit-option', function (event) {
                 if ($(this).attr('disabled')) {
@@ -276,13 +264,13 @@
                 const rawAmountValue = parseInt($("#amount").val(), 10);
                 const absAmountValue = Math.abs(rawAmountValue)
                 $("#amount").val(absAmountValue);
-                const unit = unitInput.val();
+                const unitId = units.get(unitInput.val());
                 const period = periodInput.val();
 
                 const data = {
                     habitName: habit,
                     amount: absAmountValue,
-                    unit: unit,
+                    unitId: unitId,
                     period: period,
                     description: $("#text").val(),
                     timeOffset: new Date().getTimezoneOffset(),
@@ -290,7 +278,7 @@
                 Object.keys(data).forEach(
                     (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
                 );
-                if (data.habitName && data.amount && data.unit && data.period) {
+                if (data.habitName && data.amount && data.unitId && data.period) {
                     mainButton.text = "Отправить";
                     enableSubmit(true);
                 } else {
