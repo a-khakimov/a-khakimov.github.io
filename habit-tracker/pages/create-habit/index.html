@@ -34,14 +34,18 @@
             const chatId = searchParams.get("chatId");
             const userId = searchParams.get("userId");
 
-            console.log("initData - " + initData)
+            const params = new URLSearchParams(Telegram.WebApp.initData);
+            const userData = Object.fromEntries(params);
 
-            //let paramObj = {};
-            //for(var value of searchParams.keys()) {
-            //    paramObj[value] = searchParams.get(value);
-            //    console.log(value + " - " + searchParams.get(value))
-            //    $("#text").val() = $("#text").val() + value + " - " + searchParams.get(value)
-            //}
+            console.log("initData")
+            console.log(params)
+            console.log(userData)
+
+            let paramObj = {};
+            for(var value of params.keys()) {
+                paramObj[value] = params.get(value);
+                console.log(value + " - " + params.get(value))
+            }
             
             // Select habit button
             const dropdownButton = $('.select-habit-button')
