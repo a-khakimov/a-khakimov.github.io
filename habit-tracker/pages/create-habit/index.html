@@ -184,6 +184,11 @@
                 })
                 .catch((error) => {
                     console.error(error);
+                    $('#unit-dropdown').append(
+                        `<li class="select-unit-option" data-value="Не удалось загрузить">
+                            <span>Не удалось загрузить</span>
+                        </li>`
+                    );
                 });
 
             $(document).on('click', '.select-unit-option', function (event) {
