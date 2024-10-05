@@ -31,6 +31,7 @@
 
             const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
             const mainButton = window.Telegram.WebApp.MainButton;
+            const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
             const userId = searchParams.get("userId");
             

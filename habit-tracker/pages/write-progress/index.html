@@ -17,14 +17,11 @@
     <script>
         $(document).ready(function () {
 
+            const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
             const mainButton = window.Telegram.WebApp.MainButton;
-            const initData = window.Telegram.WebApp.initData;
             const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
             const userId = searchParams.get("userId");
-
-            const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
-            //const apiUrl = "http://localhost:8080"
 
             fetch(`${apiUrl}/api/habits/${userId}`)
                 .then((response) => response.json())
