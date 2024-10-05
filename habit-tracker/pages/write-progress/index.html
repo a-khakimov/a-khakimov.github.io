@@ -3,31 +3,50 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Spend book page</title>
+    <title>Трекер привычек</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="../../styles.css" />
     <script src="../../js/dropDowns.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
     <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
     <script>
-            const habits = [
-                "Отжимание",
-                "Пение",
-                "Медитация",
-                "Ходить в зал",
-            ]
-
         $(document).ready(function () {
 
             const mainButton = window.Telegram.WebApp.MainButton;
             const initData = window.Telegram.WebApp.initData;
             const searchParams = new URLSearchParams(window.location.search);
             const chatId = searchParams.get("chatId");
+            const userId = searchParams.get("userId");
+
+            const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
+            //const apiUrl = "http://localhost:8080"
+
+            fetch(`${apiUrl}/api/habits/${userId}`)
+                .then((response) => response.json())
+                .then((userHabits) => {
+                    $.each(userHabits, function (key, str) {
+                        const habitName = str['name']
+                        $('#habit-dropdown').append(
+                            `<li class="select-habit-option" data-value="${habitName}">
+                                <span>${habitName}</span>
+                            </li>`
+                        )
+                    })
+                })
+                .catch((error) => {
+                    console.error(error)
+                    $('#habit-dropdown').append(
+                            `<li class="select-habit-option" data-value="Не удалось получить список привычек">
+                                <span>Не удалось загрузить список привычек</span>
+                            </li>`
+                        )
+                    }
+                );
 
             console.log("init data: " + initData)
             let paramObj = {};
@@ -37,7 +56,6 @@
                 $("#text").val() = $("#text").val() + value + " - " + searchParams.get(value)
             }
             
-
             // Select habit button
             const dropdownButton = $('.select-habit-button')
             const dropdownMenu = $('.select-habit-options')
@@ -54,15 +72,6 @@
                     dropdownButton.removeClass('dropdown_habit_button_active');
                     dropdownMenu.removeClass('select-habit-options-visible');
                 }
-            })
-
-            $.each(habits, function (key, str) {
-                console.log(str)
-                    $('#habit-dropdown').append(
-                        `<li class="select-habit-option" data-value="${str}">
-                            <span>${str}</span>
-                        </li>`
-                    )
             })
 
             $(document).on('click', '.select-habit-option', function (event) {
@@ -234,9 +243,6 @@
 
             function collectData() {
                 var habit = $(".hidden-habit-input").val();
-                if (habit === 'Создать новую привычку') {
-                    habit = $("#custom_input").val();
-                }
                 const rawAmountValue = parseInt($("#amount").val(), 10);
                 const absAmountValue = Math.abs(rawAmountValue)
                 $("#amount").val(absAmountValue);
@@ -249,12 +255,11 @@
                     unit: unit,
                     period: period,
                     description: $("#text").val(),
-                    timeOffset: new Date().getTimezoneOffset(),
                 };
                 Object.keys(data).forEach(
                     (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
                 );
-                if (data.habitName && data.amount && data.unit && data.period) {
+                if (data.habitName && data.amount && data.unit) {
                     mainButton.text = "Отправить";
                     enableSubmit(true);
                 } else {
@@ -307,7 +312,7 @@
     <form class="form">
         <div class="field-wrapper">
             <span class="label">Выбрать привычку</span>
-            <button class="select-habit-button" type="button">Привычка</button>
+            <button class="select-habit-button" type="button">Выберите привычку</button>
         </div>
         <ul id="habit-dropdown" class="select-habit-options"></ul>
 

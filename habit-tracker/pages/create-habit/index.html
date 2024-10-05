@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Spend book page</title>
+    <title>Трекер привычек</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="../../styles.css" />
     <script src="../../js/dropDowns.js"></script>
@@ -40,7 +40,6 @@
                 $("#text").val() = $("#text").val() + value + " - " + searchParams.get(value)
             }
             
-
             // Select habit button
             const dropdownButton = $('.select-habit-button')
             const dropdownMenu = $('.select-habit-options')
@@ -166,6 +165,30 @@
             })
 
             const units = [ "Раз", "Минута", "Час", "Метр", "Километр", "Литр", "Грамм", "Килограмм" ]
+
+
+            //const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
+            const apiUrl = "http://localhost:8080"
+
+            fetch(`${apiUrl}/api/habit/units/${userId}`)
+                .then((response) => response.json())
+                .then((response) => {
+                    response
+
+                    $.each(userHabits, function (key, str) {
+                        const habitName = str['name']
+                        $('#habit-dropdown').append(
+                            `<li class="select-habit-option" data-value="${habitName}">
+                                <span>${habitName}</span>
+                            </li>`
+                        )
+                    })
+                })
+                .catch((error) => {
+                    console.error(error)
+                    ["???"]
+                );
+
             $.each(units, function (key, str) {
                 console.log(str)
                 $('#unit-dropdown').append(
