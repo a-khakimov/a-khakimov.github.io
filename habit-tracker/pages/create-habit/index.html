@@ -278,7 +278,7 @@
                     (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
                 );
                 if (data.habitName && data.amount && data.unitId && data.period) {
-                    mainButton.text = "Отправить";
+                    mainButton.text = "Создать";
                     enableSubmit(true);
                 } else {
                     enableSubmit(false);
