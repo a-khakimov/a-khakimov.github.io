@@ -466,8 +466,8 @@ input[type=number] {
     height: 100%;
 }
 
-.checkbox-label input:checked ~ .checkmark {
-    background-image: url('./images/rotate-ccw.svg');
+.checkbox-label input:checked ~ .checkmark::after {
+    content: "↩️";
 }
 
 .checkbox-label input:checked ~ .checkmark b {
