@@ -437,8 +437,8 @@ input[type=number] {
 
 .button-label {
     position: relative;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     padding-left: 15px;
     cursor: pointer;
 }
@@ -446,8 +446,8 @@ input[type=number] {
 .checkbox-label {
     position: relative;
 
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     padding-left: 15px;
     cursor: pointer;
 }
@@ -523,8 +523,8 @@ input[type=number] {
     display: flex; /* Используем flexbox для выравнивания */
     justify-content: space-between; /* Раздвигаем содержимое на обе стороны */
     align-items: center; /* Центрируем по вертикали */
-    border: 2px solid var(--tg-theme-section-separator-color);
-    color: var(--tg-theme-section-bg-color);
+    border: 1px solid var(--tg-theme-section-separator-color);
+    color: var(--tg-theme-header-bg-color);
     line-height: 1.0; /* Уменьшение расстояния между строками в карточке */
     padding: 5px;
     margin: 5px;
