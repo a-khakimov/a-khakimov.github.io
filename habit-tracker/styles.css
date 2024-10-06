@@ -438,8 +438,8 @@ input[type=number] {
 .button-label {
     background-color: var(--tg-theme-button-color);
     position: relative;
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     padding-left: 15px;
     cursor: pointer;
 }
@@ -448,8 +448,8 @@ input[type=number] {
     background-color: var(--tg-theme-button-color);
     position: relative;
 
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     padding-left: 15px;
     cursor: pointer;
 }
@@ -538,8 +538,8 @@ input[type=number] {
 }
 
 .habit-card h4 {
-    margin-top: 0px; /* Уменьшение расстояния между заголовком и верхней границей карточки */
-    margin: 5px 0;
+    margin-top: 5px; /* Уменьшение расстояния между заголовком и верхней границей карточки */
+    margin-bottom: 5px;
 }
 
 .habit-card p {

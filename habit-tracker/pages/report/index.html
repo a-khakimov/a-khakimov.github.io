@@ -52,7 +52,7 @@
           const habitCard = `
             <div class="habit-card" data-id="${habit.id}">
               <div class="habit-content">
-                  <h3>${habit.name}</h3>
+                  <h4>${habit.name}</h3>
                   <p>Цель: ${habit.goal}</p>
                   <p>Прогресс: ${habit.currentProgress} из ${habit.goalAmount}</p>
               </div>
@@ -61,6 +61,7 @@
                   <span class="checkmark"><b>📊</b></span>
                 </a>
               </label>
+              <div>  </div>
               <label class="checkbox-label">
                   <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${habit.id}">
                   <span class="checkmark"><b>🗑️</b></span>
@@ -75,6 +76,13 @@
   </head>
 
   <body>
+    <dotlottie-player src="../../images/write.json"
+      background="transparent"
+      speed="1"
+      style="width: 100%; height: 100px; text-align: center;"
+      loop
+      autoplay>
+    </dotlottie-player>
     <div id="habit-list"></div>
   </body>
 </html>
