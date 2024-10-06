@@ -435,7 +435,17 @@ input[type=number] {
     color: var(--tg-theme-button-text-color)
 }
 
+.button-label {
+    background-color: var(--tg-theme-button-color);
+    position: relative;
+    width: 25px;
+    height: 25px;
+    padding-left: 15px;
+    cursor: pointer;
+}
+
 .checkbox-label {
+    background-color: var(--tg-theme-button-color);
     position: relative;
 
     width: 25px;
@@ -517,16 +527,18 @@ input[type=number] {
     display: flex; /* Используем flexbox для выравнивания */
     justify-content: space-between; /* Раздвигаем содержимое на обе стороны */
     align-items: center; /* Центрируем по вертикали */
-    border: 1px solid var(--tg-theme-button-color);
+    border: 2px solid var(--tg-theme-button-text-color);
+    background-color: var(--tg-theme-secondary-bg-color);
     line-height: 1.0; /* Уменьшение расстояния между строками в карточке */
-    padding: 10px;
+    padding: 5px;
     margin: 5px;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     position: relative;
 }
 
 .habit-card h4 {
+    margin-top: 0px; /* Уменьшение расстояния между заголовком и верхней границей карточки */
     margin: 5px 0;
 }
 
@@ -541,13 +553,4 @@ input[type=number] {
 .checkbox-label {
     display: flex; /* Используем flex для чекбокса и иконки */
     align-items: center; /* Центрируем по вертикали */
-}
-
-.report {
-    display: flex;
-    margin-top: 10px;
-    font-size: 14px;
-    color: var(--tg-theme-secondary-bg-color);
-    opacity: 0; /* Начальная прозрачность */
-    transition: opacity 0.3s ease; /* Плавный переход */
 }
