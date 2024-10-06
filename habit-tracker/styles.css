@@ -436,7 +436,6 @@ input[type=number] {
 }
 
 .button-label {
-    background-color: var(--tg-theme-button-color);
     position: relative;
     width: 30px;
     height: 30px;
@@ -445,7 +444,6 @@ input[type=number] {
 }
 
 .checkbox-label {
-    background-color: var(--tg-theme-button-color);
     position: relative;
 
     width: 30px;
@@ -527,8 +525,8 @@ input[type=number] {
     display: flex; /* Используем flexbox для выравнивания */
     justify-content: space-between; /* Раздвигаем содержимое на обе стороны */
     align-items: center; /* Центрируем по вертикали */
-    border: 2px solid var(--tg-theme-button-text-color);
-    background-color: var(--tg-theme-secondary-bg-color);
+    border: 2px solid var(--tg-theme-secondary-bg-color);
+    background-color: var(--tg-theme-button-color);
     line-height: 1.0; /* Уменьшение расстояния между строками в карточке */
     padding: 5px;
     margin: 5px;
@@ -540,10 +538,12 @@ input[type=number] {
 .habit-card h4 {
     margin-top: 5px; /* Уменьшение расстояния между заголовком и верхней границей карточки */
     margin-bottom: 5px;
+    color: var(--tg-theme-button-text-color)
 }
 
 .habit-card p {
     margin: 5px 0;
+    color: var(--tg-theme-button-text-color)
 }
 
 .habit-content {
