@@ -524,7 +524,7 @@ input[type=number] {
     justify-content: space-between; /* Раздвигаем содержимое на обе стороны */
     align-items: center; /* Центрируем по вертикали */
     border: 2px solid var(--tg-theme-section-separator-color);
-    background-color: var(--tg-theme-section-bg-color);
+    color: var(--tg-theme-section-bg-color);
     line-height: 1.0; /* Уменьшение расстояния между строками в карточке */
     padding: 5px;
     margin: 5px;
@@ -541,7 +541,7 @@ input[type=number] {
 
 .habit-card p {
     margin: 5px 0;
-    color: var(--tg-theme-text-color)
+    color: var(--tg-theme-subtitle-text-color)
 }
 
 .habit-content {
