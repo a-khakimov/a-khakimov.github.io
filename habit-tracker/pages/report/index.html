@@ -23,11 +23,53 @@
           window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
         });
 
+        // Тестовые данные привычек
+        const testHabits = [
+          {
+            id: 1,
+            name: "50 отжиманий",
+            goal: "50 отжиманий в день",
+            currentProgress: 20,
+            goalAmount: 50
+          },
+          {
+            id: 2,
+            name: "Чтение",
+            goal: "30 минут чтения в день",
+            currentProgress: 15,
+            goalAmount: 30
+          },
+          {
+            id: 3,
+            name: "Бег",
+            goal: "5 км пробежка",
+            currentProgress: 3,
+            goalAmount: 5
+          }
+        ];
+
+        testHabits.forEach(habit => {
+          const habitCard = `
+            <div class="habit-card" data-id="${habit.id}">
+                <h3>${habit.name}</h3>
+                <p>Цель: ${habit.goal}</p>
+                <p>Прогресс: ${habit.currentProgress} из ${habit.goalAmount}</p>
+                <div class="report">Отчет по привычке: ${habit.name}</div>
+                </div>
+              `;
+            $('#habit-list').append(habitCard);
+        });
+
+        $('.habit-card').on('click', function () {
+          $(this).find('.report').toggle();
+        });
+
         function collectData() { }
       });
     </script>
   </head>
 
   <body>
+    <div id="habit-list"></div>
   </body>
 </html>
