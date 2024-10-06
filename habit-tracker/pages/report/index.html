@@ -51,17 +51,22 @@
         testHabits.forEach(habit => {
           const habitCard = `
             <div class="habit-card" data-id="${habit.id}">
-                <h3>${habit.name}</h3>
-                <p>Цель: ${habit.goal}</p>
-                <p>Прогресс: ${habit.currentProgress} из ${habit.goalAmount}</p>
-                <div class="report">Отчет по привычке: ${habit.name}</div>
-                </div>
-              `;
+              <div class="habit-content">
+                  <h3>${habit.name}</h3>
+                  <p>Цель: ${habit.goal}</p>
+                  <p>Прогресс: ${habit.currentProgress} из ${habit.goalAmount}</p>
+              </div>
+              <label class="button-label">
+                <a href="https://ainur-khakimov.ru" class="button">
+                  <span class="checkmark"><b>📊</b></span>
+                </a>
+              </label>
+              <label class="checkbox-label">
+                  <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${habit.id}">
+                  <span class="checkmark"><b>🗑️</b></span>
+              </label>
+            </div>`;
             $('#habit-list').append(habitCard);
-        });
-
-        $('.habit-card').on('click', function () {
-          $(this).find('.report').toggle();
         });
 
         function collectData() { }
