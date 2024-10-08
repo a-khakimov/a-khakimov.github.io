@@ -552,3 +552,18 @@ input[type=number] {
     display: flex; /* Используем flex для чекбокса и иконки */
     align-items: center; /* Центрируем по вертикали */
 }
+
+
+/* REPORT */
+
+.cal-heatmap-container {
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cal-heatmap {
+    width: 100%; /* Ширина элемента на 100% */
+    display: flex;
+    justify-content: center; /* Центрируем содержимое по горизонтали */
+}
