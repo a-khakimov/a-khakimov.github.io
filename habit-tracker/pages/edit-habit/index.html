@@ -80,6 +80,7 @@
           amountMenu.removeClass("select-amount-options-visible");
 
           collectData();
+          enableSubmit();
         });
 
         // Select unit button
@@ -173,6 +174,7 @@
           unitMenu.removeClass("select-unit-options-visible");
 
           collectData();
+          enableSubmit();
         });
 
         // Select period button
@@ -221,6 +223,7 @@
           periodMenu.removeClass("select-period-options-visible");
 
           collectData();
+          enableSubmit();
         });
 
         // Other
@@ -273,10 +276,8 @@
             data.newDescription === habit.description
           ) {
             isChanged = false
-            enableSubmit();
           } else {
             isChanged = true
-            enableSubmit();
           }
           return data;
         }
@@ -293,9 +294,18 @@
           return [year, month, day].join("-");
         }
 
-        $("#custom_input").on("input", collectData);
-        $("#amount").on("input", collectData);
-        $("#text").on("input", collectData);
+        $("#custom_input").on("input", function () {
+            collectData();
+            enableSubmit();
+        });
+        $("#amount").on("input", function () {
+            collectData();
+            enableSubmit();
+        });
+        $("#text").on("input", function () {
+            collectData();
+            enableSubmit();
+        });
 
         function enableSubmit() {
           console.log(`enableSubmit: isChanged=${isChanged}, isDelete=${isDelete}`);
