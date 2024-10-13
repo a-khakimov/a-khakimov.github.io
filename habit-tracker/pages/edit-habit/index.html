@@ -231,17 +231,18 @@
         let isDelete = false;
         let isChanged = false;
 
-        $(document).on("click", ".checkbox-label", function (event) {
-          event.stopPropagation();
-
-          if ($("input:checkbox[name=category-checkbox]:checked").length) {
-            isDelete = true;
-            enableSubmit();
-          } else {
-            isDelete = false;
+        $(document).on(
+          "change",
+          "input:checkbox[name=delete-habit-checkbox]",
+          function (event) {
+            if ($(this).is(":checked")) {
+              isDelete = true;
+            } else {
+              isDelete = false;
+            }
             enableSubmit();
           }
-        });
+        );
 
         function collectData() {
           newHabitName = $("#custom_input").val();
@@ -313,22 +314,22 @@
           );
           if (isDelete) {
             mainButton.text = "Удалить привычку";
-        mainButton.enable();
-        mainButton.show();
+            mainButton.enable();
+            mainButton.show();
             mainButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
           } else if (isChanged) {
             mainButton.text = "Применить изменения";
-        mainButton.enable();
-        mainButton.show();
+            mainButton.enable();
+            mainButton.show();
             mainButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
           } else {
             mainButton.text = "Назад";
-        mainButton.enable();
-        mainButton.show();
+            mainButton.enable();
+            mainButton.show();
             mainButton.onClick(function () {
               window.history.back();
             });
@@ -420,7 +421,7 @@
           <input
             type="checkbox"
             class="option-checkbox"
-            name="category-checkbox"
+            name="delete-habit-checkbox"
             value="${str}"
           />
           <span class="checkmark"><b>🗑️</b></span>
