@@ -316,7 +316,7 @@
             `enableSubmit: isChanged=${isChanged}, isDelete=${isDelete}`
           );
           if (isDelete) {
-            popupButton.setText("Удалить привычку");
+            mainButton.setText("Удалить привычку");
             mainButton.offClick(function () { window.history.back(); });
             mainButton.onClick(function () { window.Telegram.WebApp.sendData(JSON.stringify(collectData()));});
             mainButton.show();
