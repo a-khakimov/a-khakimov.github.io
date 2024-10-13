@@ -437,8 +437,9 @@ input[type=number] {
 
 .button-label {
     position: relative;
-    width: 25px;
-    height: 25px;
+    text-align: center;
+    width: 40px;
+    height: 40px;
     padding-left: 15px;
     cursor: pointer;
 }

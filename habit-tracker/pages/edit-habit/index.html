@@ -225,27 +225,27 @@
 
         // Other
 
-        $(document).on('click', '.checkbox-label', function (event) {
-                event.stopPropagation()
+        $(document).on("click", ".checkbox-label", function (event) {
+          event.stopPropagation();
 
-                if ($('input:checkbox[name=category-checkbox]:checked').length) {
-                    $('.select-options .select-option').each(function () {
-                        $(this).attr('disabled', true)
-                    })
+          if ($("input:checkbox[name=category-checkbox]:checked").length) {
+            $(".select-options .select-option").each(function () {
+              $(this).attr("disabled", true);
+            });
 
-                    mainButton.text = "Подтвердить удаление";
-                    enableSubmit(true)
-                } else {
-                    $('.select-options .select-option').each(function () {
-                        $(this).attr('disabled', false)
-                    })
+            mainButton.text = "Подтвердить удаление";
+            enableSubmit(true);
+          } else {
+            $(".select-options .select-option").each(function () {
+              $(this).attr("disabled", false);
+            });
 
-                    enableSubmit(false)
-                }
-            })
+            enableSubmit(false);
+          }
+        });
 
         function collectData() {
-            newHabitName = $("#custom_input").val();
+          newHabitName = $("#custom_input").val();
           const rawAmountValue = parseInt($("#amount").val(), 10);
           const absAmountValue = Math.abs(rawAmountValue);
           $("#amount").val(absAmountValue);
@@ -266,11 +266,16 @@
               (data[key] =
                 data[key] === "any" || data[key] === "" ? null : data[key])
           );
-          if (data.newHabitName === habit.name && data.newAmount === habit.amount && data.newUnitId === habit.unitId && data.newPeriod === habit.newPeriod) {
+          if (
+            data.newHabitName === habit.name &&
+            data.newAmount === habit.amount &&
+            data.newUnitId === habit.unitId &&
+            data.newPeriod === habit.newPeriod
+          ) {
             enableSubmit(false);
           } else {
+              mainButton.text = "Применить изменения";
             enableSubmit(true);
-            mainButton.text = "Применить изменения";
           }
           return data;
         }
@@ -290,17 +295,17 @@
         $("#custom_input").on("input", collectData);
         $("#amount").on("input", collectData);
 
-        mainButton.enable();
-        mainButton.onClick(function () {
-          window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
-        });
-
         function enableSubmit(activate) {
           console.log("enableSubmit: " + activate);
           if (activate) {
-            mainButton.show();
+            mainButton.onClick(function () {
+              window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+            });
           } else {
-            mainButton.hide();
+            mainButton.text = "Назад";
+            mainButton.onClick(function () {
+              window.history.back();
+            });
           }
         }
       });
@@ -385,9 +390,14 @@
         ></textarea>
       </div>
       <label class="checkbox-label">
-        <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${str}">
+        <input
+          type="checkbox"
+          class="option-checkbox"
+          name="category-checkbox"
+          value="${str}"
+        />
         <span class="checkmark"><b>🗑️</b></span>
-    </label>
+      </label>
     </form>
   </body>
 </html>
