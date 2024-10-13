@@ -19,7 +19,9 @@
       
       $(document).ready(function () {
         const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
+        const frontUrl = "https://blog.ainur-khakimov.ru/habit-tracker"
         const mainButton = window.Telegram.WebApp.MainButton;
+        const backButton = window.Telegram.WebApp.BackButton;
         const searchParams = new URLSearchParams(window.location.search);
         const userId = searchParams.get("userId");
 
@@ -27,7 +29,12 @@
         mainButton.enable();
         mainButton.show();
         mainButton.onClick(function () {
-          window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+          window.Telegram.WebApp.openLink(`${frontUrl}/pages/habit-list/index.html?userId=${userId}`);
+        });
+
+        backButton.show();
+        backButton.onClick(function () {
+          window.Telegram.WebApp.openLink(`${frontUrl}/pages/habit-list/index.html?userId=${userId}`);
         });
 
         // Тестовые данные привычек
