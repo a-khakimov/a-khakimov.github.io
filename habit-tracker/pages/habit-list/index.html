@@ -21,61 +21,67 @@
         const searchParams = new URLSearchParams(window.location.search);
         const userId = searchParams.get("userId");
 
-        mainButton.text = "Применить изменения";
+        mainButton.text = "Назад";
         mainButton.enable();
         mainButton.show();
         mainButton.onClick(function () {
           window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
         });
 
-        // Тестовые данные привычек
-        const testHabits = [
-          {
-            id: 1,
-            name: "50 отжиманий",
-            goal: "50 отжиманий в день",
-            currentProgress: 20,
-            goalAmount: 50
-          },
-          {
-            id: 2,
-            name: "Чтение",
-            goal: "30 минут чтения в день",
-            currentProgress: 15,
-            goalAmount: 30
-          },
-          {
-            id: 3,
-            name: "Бег",
-            goal: "5 км пробежка",
-            currentProgress: 3,
-            goalAmount: 5
-          }
-        ];
+        fetch(`${apiUrl}/api/habits/${userId}`)
+          .then((response) => response.json())
+          .then((data) => {
+              console.info(data)
+              if (!data.error) {
+                $.each(data.payload, function(index, habit) {
+                  const card = makeCard(habit);
+                  $('#habit-list').append(card); 
+                });
+              } else {
+                console.error(`${data.error}: ${data.description}`);
+                const card = makeErrorCard(data.trackingId);
+                $('#habit-list').append(card);
+              }
+          })
+          .catch((error) => {
+            console.error("AAAAAAAAAAAA");
+            console.error(error);
+            const card = makeErrorCard("");
+            $('#habit-list').append(card);
+          });
 
-        testHabits.forEach(habit => {
-          const habitCard = `
+        function makeCard(habit) {
+          return `
             <div class="habit-card" data-id="${habit.id}">
               <div class="habit-content">
                   <h4>${habit.name}</h3>
-                  <p>Цель: ${habit.goal}</p>
-                  <p>Прогресс: ${habit.currentProgress} из ${habit.goalAmount}</p>
+                  <p>Цель: ${habit.amount}</p>
+                  <p>Прогресс: ${habit.amount} из ${habit.amount}</p>
               </div>
-              <label class="button-label">
-                <a href="https://ainur-khakimov.ru" class="button">
-                  <span class="checkmark"><b>📊</b></span>
+              <label class="checkbox-label">
+                <a href="https://blog.ainur-khakimov.ru/habit-tracker/pages/edit-habit/index.html?userId=${userId}&habitId=${habit.id}" class="button">
+                  <span class="checkmark"><b>✏️</b></span>
                 </a>
               </label>
               <div>  </div>
-              <label class="checkbox-label">
-                  <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${habit.id}">
-                  <span class="checkmark"><b>🗑️</b></span>
+              <label class="button-label">
+                <a href="https://blog.ainur-khakimov.ru/habit-tracker/pages/report/index.html?userId=${userId}&habitId=${habit.id}" class="button">
+                  <span class="checkmark"><b>📊</b></span>
+                </a>
               </label>
             </div>`;
-            $('#habit-list').append(habitCard);
-        });
+        }
 
-        function collectData() { }
+        function makeErrorCard(trackingId) {
+          return `
+            <div class="habit-card" data-id="">
+              <div class="habit-content">
+                  <h4>Что-то пошло не так...</h3>
+                  <p>Не удалось загрузить список привычек 😥</p>
+                  <a>Помоги разобраться: ${trackingId}</a>
+              </div>
+            </div>`;
+        }
       });
     </script>
   </head>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="../../styles.css" />
     <script src="../../js/dropDowns.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -48,7 +48,13 @@
         cal.paint({
           itemSelector: '#cal-heatmap',
           animationDuration: 300,
-          date: { start: new Date('2024-08-01') },
+          date: { 
+            locale: 'ru', 
+            locale: {
+              weekStart: 1,
+            },
+            start: new Date('2024-09-01'),
+          },
           data: { source: data, x: 'date', y: 'value' },
           verticalOrientation: false,
           theme: 'light',
@@ -77,6 +83,29 @@
         });
 
 
+
+      const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+          datasets: [{
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      })
+
+
         function collectData() { }
       });
     </script>
@@ -94,6 +123,7 @@
     <div id="cal-heatmap-container">
       <div id="cal-heatmap"></div>
       <div id="legend-b"></div>
+      <canvas id="myChart"></canvas>
     </div>
   </body>
 </html>
