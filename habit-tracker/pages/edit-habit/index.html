@@ -225,22 +225,18 @@
 
         // Other
 
+        let isDelete = false
+        let isChanged = false
+
         $(document).on("click", ".checkbox-label", function (event) {
           event.stopPropagation();
 
           if ($("input:checkbox[name=category-checkbox]:checked").length) {
-            $(".select-options .select-option").each(function () {
-              $(this).attr("disabled", true);
-            });
-
-            mainButton.text = "Подтвердить удаление";
-            enableSubmit(true);
+            isDelete = true;
+            enableSubmit();
           } else {
-            $(".select-options .select-option").each(function () {
-              $(this).attr("disabled", false);
-            });
-
-            enableSubmit(false);
+            isDelete = false;
+            enableSubmit();
           }
         });
 
@@ -258,7 +254,7 @@
             newUnitId: unitId,
             newPeriod: period,
             newDescription: $("#text").val(),
-            delete: false,
+            isDelete: isDelete,
             timeOffset: new Date().getTimezoneOffset(),
           };
           Object.keys(data).forEach(
@@ -266,16 +262,19 @@
               (data[key] =
                 data[key] === "any" || data[key] === "" ? null : data[key])
           );
+          console.log(data)
+          console.log(habit)
           if (
             data.newHabitName === habit.name &&
             data.newAmount === habit.amount &&
             data.newUnitId === habit.unitId &&
             data.newPeriod === habit.newPeriod
           ) {
-            enableSubmit(false);
+            isChanged = false
+            enableSubmit();
           } else {
-              mainButton.text = "Применить изменения";
-            enableSubmit(true);
+            isChanged = true
+            enableSubmit();
           }
           return data;
         }
@@ -295,9 +294,15 @@
         $("#custom_input").on("input", collectData);
         $("#amount").on("input", collectData);
 
-        function enableSubmit(activate) {
-          console.log("enableSubmit: " + activate);
-          if (activate) {
+        function enableSubmit() {
+          console.log(`enableSubmit: isChanged=${isChanged}, isDelete=${isDelete}`);
+          if (isDelete) {
+            mainButton.text = "Удалить привычку";
+            mainButton.onClick(function () {
+              window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+            });
+          } else if (isChanged) {
+            mainButton.text = "Применить изменения";
             mainButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
@@ -389,15 +394,17 @@
           class="text-field"
         ></textarea>
       </div>
-      <label class="checkbox-label">
-        <input
-          type="checkbox"
-          class="option-checkbox"
-          name="category-checkbox"
-          value="${str}"
-        />
-        <span class="checkmark"><b>🗑️</b></span>
-      </label>
+      <div class="field-wrapper">
+        <label class="checkbox-label">
+            <input
+              type="checkbox"
+              class="option-checkbox"
+              name="category-checkbox"
+              value="${str}"
+            />
+            <span class="checkmark"><b>🗑️</b></span>
+          </label>
+      </div>
     </form>
   </body>
 </html>
