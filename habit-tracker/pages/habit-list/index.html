@@ -18,12 +18,16 @@
       $(document).ready(function () {
         const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
         const mainButton = window.Telegram.WebApp.MainButton;
+        const backButton = window.Telegram.WebApp.BackButton;
         const searchParams = new URLSearchParams(window.location.search);
         const userId = searchParams.get("userId");
 
+        backButton.text = "Назад";
+        backButton.show();
+
         mainButton.text = "Назад";
         mainButton.enable();
-        mainButton.show();
+        mainButton.hide();
         mainButton.onClick(function () {
           window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
         });
