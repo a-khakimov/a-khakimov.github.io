@@ -24,6 +24,8 @@
         const apiUrl = "https://ainur-khakimov.ru/habit-tracker";
         const mainButton = window.Telegram.WebApp.MainButton;
         const backButton = window.Telegram.WebApp.BackButton;
+        const popupButton = window.Telegram.WebApp.PopupButton;
+        
         const searchParams = new URLSearchParams(window.location.search);
         const userId = searchParams.get("userId");
         const habitId = searchParams.get("habitId");
@@ -313,12 +315,12 @@
             `enableSubmit: isChanged=${isChanged}, isDelete=${isDelete}`
           );
           if (isDelete) {
-            mainButton.text = "Удалить привычку";
-            mainButton.onClick(function () {
+            popupButton.text = "Удалить привычку";
+            popupButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
-            mainButton.enable();
-            mainButton.show();
+            popupButton.show();
+            mainButton.hide();
           } else if (isChanged) {
             mainButton.text = "Применить изменения";
             mainButton.onClick(function () {
@@ -326,8 +328,10 @@
             });
             mainButton.enable();
             mainButton.show();
+            popupButton.hide();
           } else {
             //mainButton.text = "Назад";
+            popupButton.hide();
             mainButton.disable();
             mainButton.hide();
             //mainButton.onClick(function () {
