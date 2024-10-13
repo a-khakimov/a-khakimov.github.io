@@ -22,7 +22,6 @@
         const searchParams = new URLSearchParams(window.location.search);
         const userId = searchParams.get("userId");
 
-        backButton.text = "Назад";
         backButton.show();
         backButton.onClick(function () {
           window.Telegram.WebApp.close();
@@ -30,9 +29,9 @@
 
         mainButton.text = "Назад";
         mainButton.enable();
-        mainButton.hide();
+        mainButton.show();
         mainButton.onClick(function () {
-          window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+          window.Telegram.WebApp.close();
         });
 
         fetch(`${apiUrl}/api/habits/${userId}`)
