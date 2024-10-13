@@ -28,12 +28,12 @@
         const userId = searchParams.get("userId");
         const habitId = searchParams.get("habitId");
 
-        mainButton.text = "Назад";
-        mainButton.enable();
-        mainButton.show();
-        mainButton.onClick(function () {
-          window.history.back();
-        });
+        //mainButton.text = "Назад";
+        //mainButton.enable();
+        //mainButton.show();
+        //mainButton.onClick(function () {
+        //  window.history.back();
+        //});
 
         backButton.show();
         backButton.onClick(function () {
@@ -327,12 +327,12 @@
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
           } else {
-            mainButton.text = "Назад";
-            mainButton.enable();
-            mainButton.show();
-            mainButton.onClick(function () {
-              window.history.back();
-            });
+            //mainButton.text = "Назад";
+            mainButton.disable();
+            mainButton.hide();
+            //mainButton.onClick(function () {
+            //  window.history.back();
+            //});
           }
         }
       });
