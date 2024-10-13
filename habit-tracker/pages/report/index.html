@@ -25,16 +25,16 @@
         const searchParams = new URLSearchParams(window.location.search);
         const userId = searchParams.get("userId");
 
-        mainButton.text = "Применить изменения";
+        mainButton.text = "Назад";
         mainButton.enable();
         mainButton.show();
         mainButton.onClick(function () {
-          window.Telegram.WebApp.openLink(`${frontUrl}/pages/habit-list/index.html?userId=${userId}`);
+          window.history.back();
         });
 
         backButton.show();
         backButton.onClick(function () {
-          window.Telegram.WebApp.openLink(`${frontUrl}/pages/habit-list/index.html?userId=${userId}`);
+          window.history.back();
         });
 
         // Тестовые данные привычек
