@@ -249,6 +249,7 @@
           const period = periodInput.val();
 
           const data = {
+            id: habit.id,
             newHabitName: newHabitName,
             newAmount: absAmountValue,
             newUnitId: unitId,
@@ -268,7 +269,8 @@
             data.newHabitName === habit.name &&
             data.newAmount === habit.amount &&
             data.newUnitId === habit.unitId &&
-            data.newPeriod === habit.newPeriod
+            data.newPeriod === habit.period &&
+            data.newDescription === habit.description
           ) {
             isChanged = false
             enableSubmit();
@@ -293,6 +295,7 @@
 
         $("#custom_input").on("input", collectData);
         $("#amount").on("input", collectData);
+        $("#text").on("input", collectData);
 
         function enableSubmit() {
           console.log(`enableSubmit: isChanged=${isChanged}, isDelete=${isDelete}`);
