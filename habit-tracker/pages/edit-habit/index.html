@@ -314,18 +314,18 @@
           );
           if (isDelete) {
             mainButton.text = "Удалить привычку";
-            mainButton.enable();
-            mainButton.show();
             mainButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
+            mainButton.enable();
+            mainButton.show();
           } else if (isChanged) {
             mainButton.text = "Применить изменения";
-            mainButton.enable();
-            mainButton.show();
             mainButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
+            mainButton.enable();
+            mainButton.show();
           } else {
             //mainButton.text = "Назад";
             mainButton.disable();
