@@ -228,8 +228,8 @@
 
         // Other
 
-        let isDelete = false
-        let isChanged = false
+        let isDelete = false;
+        let isChanged = false;
 
         $(document).on("click", ".checkbox-label", function (event) {
           event.stopPropagation();
@@ -266,8 +266,8 @@
               (data[key] =
                 data[key] === "any" || data[key] === "" ? null : data[key])
           );
-          console.log(data)
-          console.log(habit)
+          console.log(data);
+          console.log(habit);
           if (
             data.newHabitName === habit.name &&
             data.newAmount === habit.amount &&
@@ -275,9 +275,9 @@
             data.newPeriod === habit.period &&
             data.newDescription === habit.description
           ) {
-            isChanged = false
+            isChanged = false;
           } else {
-            isChanged = true
+            isChanged = true;
           }
           return data;
         }
@@ -295,32 +295,40 @@
         }
 
         $("#custom_input").on("input", function () {
-            collectData();
-            enableSubmit();
+          collectData();
+          enableSubmit();
         });
         $("#amount").on("input", function () {
-            collectData();
-            enableSubmit();
+          collectData();
+          enableSubmit();
         });
         $("#text").on("input", function () {
-            collectData();
-            enableSubmit();
+          collectData();
+          enableSubmit();
         });
 
         function enableSubmit() {
-          console.log(`enableSubmit: isChanged=${isChanged}, isDelete=${isDelete}`);
+          console.log(
+            `enableSubmit: isChanged=${isChanged}, isDelete=${isDelete}`
+          );
           if (isDelete) {
             mainButton.text = "Удалить привычку";
+        mainButton.enable();
+        mainButton.show();
             mainButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
           } else if (isChanged) {
             mainButton.text = "Применить изменения";
+        mainButton.enable();
+        mainButton.show();
             mainButton.onClick(function () {
               window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
             });
           } else {
             mainButton.text = "Назад";
+        mainButton.enable();
+        mainButton.show();
             mainButton.onClick(function () {
               window.history.back();
             });
@@ -409,14 +417,14 @@
       </div>
       <div class="field-wrapper">
         <label class="checkbox-label">
-            <input
-              type="checkbox"
-              class="option-checkbox"
-              name="category-checkbox"
-              value="${str}"
-            />
-            <span class="checkmark"><b>🗑️</b></span>
-          </label>
+          <input
+            type="checkbox"
+            class="option-checkbox"
+            name="category-checkbox"
+            value="${str}"
+          />
+          <span class="checkmark"><b>🗑️</b></span>
+        </label>
       </div>
     </form>
   </body>
