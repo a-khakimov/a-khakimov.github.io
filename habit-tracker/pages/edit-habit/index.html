@@ -320,16 +320,19 @@
             mainButton.offClick(function () { window.history.back(); });
             mainButton.onClick(function () { window.Telegram.WebApp.sendData(JSON.stringify(collectData()));});
             mainButton.show();
+            mainButton.enable();
           } else if (isChanged) {
             mainButton.text = "Применить изменения";
             mainButton.offClick(function () { window.history.back(); });
             mainButton.onClick(function () { window.Telegram.WebApp.sendData(JSON.stringify(collectData()));});
             mainButton.show();
+            mainButton.enable();
           } else {
             mainButton.setText("Назад");
             mainButton.onClick(function () { window.history.back(); });
             mainButton.offClick(function () { window.Telegram.WebApp.sendData(JSON.stringify(collectData()));});
             mainButton.show();
+            mainButton.enable();
           }
         }
       });
