@@ -24,6 +24,9 @@
 
         backButton.text = "Назад";
         backButton.show();
+        backButton.onClick(function () {
+          window.Telegram.WebApp.close();
+        });
 
         mainButton.text = "Назад";
         mainButton.enable();
