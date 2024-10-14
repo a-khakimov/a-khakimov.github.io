@@ -175,7 +175,7 @@
                 console.log('updateUnits: [userHabits] ' + userHabits)
                 console.log('updateUnits: [habit] ' + habit)
                 
-                const firstUnit = habit.units[0];
+                const firstUnit = habit.unitIds[0];
                 console.log('updateUnits: [firstUnit] ' + firstUnit)
                 const firstUnitName = units.get(firstUnit);
 
@@ -186,7 +186,7 @@
                 unitInput.val(firstUnitName);
 
                 $('#unit-dropdown').empty();
-                $.each(habit.units, function (id, unitId) {
+                $.each(habit.unitIds, function (id, unitId) {
                     const unitName = units.get(unitId);
                     console.log(unitName);
                     $('#unit-dropdown').append(`<li class="select-unit-option" data-value="${unitName}"><span>${unitName}</span></li>`);
