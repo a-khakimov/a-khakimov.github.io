@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Трекер привычек</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../styles.css" />
+    <script src="../../js/dropDowns.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+    <script>
+        $(document).ready(function () {
+
+            const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
+            //const apiUrl = "http://localhost:8080"
+            const mainButton = window.Telegram.WebApp.MainButton;
+            const searchParams = new URLSearchParams(window.location.search);
+            const chatId = searchParams.get("chatId");
+            const userId = searchParams.get("userId");
+
+            const habitsIsNotCreated = "Вы еще не создали привычки";
+            const habitsLoadFailed = "Не удалось загрузить список привычек";
+            const selectHabit = "Выберите привычку"
+
+            let userHabits = new Map();
+            let units = new Map();
+
+            fetch(`${apiUrl}/api/habit/units/${userId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    $.each(data.payload, function(index, category) {
+                        $.each(category.units, function(index, unit) {
+                            units.set(unit.id, unit.name);
+                        })
+                    });
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
+            console.log(units)
+            fetch(`${apiUrl}/api/habits/${userId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    $.each(data.payload, function (key, habit) {
+                        console.log(habit['name']);
+                        userHabits.set(habit.name, habit);
+                    });
+                })
+                .then((sd) => {
+                    if (userHabits.size > 0) {
+                        userHabits.forEach(function (userHabit, key) {
+                            console.log(userHabit);
+                            const habitName = userHabit['name'];
+                            $('#habit-dropdown').append(`<li class="select-habit-option" data-value="${habitName}"><span>${habitName}</span></li>`);
+                        })
+                    } else {
+                        $('#habit-dropdown').append(`<li class="select-habit-option" data-value="${habitsIsNotCreated}"><span>${habitsIsNotCreated}</span></li>`)
+                    }
+                })
+                .catch((error) => {
+                    console.error(error)
+                    $('#habit-dropdown').append(`<li class="select-habit-option" data-value="${habitsLoadFailed}"><span>${habitsLoadFailed}</span></li>`)
+                });
+            
+            // Select habit button
+            const dropdownButton = $('.select-habit-button')
+            const dropdownMenu = $('.select-habit-options')
+            const dropdownInput = $('.hidden-habit-input')
+
+            dropdownButton.on('click', function () {
+                console.log("Click dropdownButton")
+                dropdownMenu.toggleClass('select-habit-options-visible');
+                $(this).toggleClass('dropdown_habit_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    dropdownButton.removeClass('dropdown_habit_button_active');
+                    dropdownMenu.removeClass('select-habit-options-visible');
+                }
+            })
+
+            $(document).on('click', '.select-habit-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-habit-options .select-habit-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                dropdownButton.html($(this).children('span').text())
+                dropdownInput.val($(this).attr('data-value'))
+                dropdownMenu.removeClass('select-habit-options-visible')
+
+                const selectedHabitName = dropdownInput.val()
+                console.log("selectedHabitName: " + selectedHabitName)
+                updateUnits(selectedHabitName)
+
+                collectData()
+            });
+
+
+            // Select amount button
+
+            const amountButton = $('.select-amount-button')
+            const amountMenu = $('.select-amount-options')
+            const amountInput = $('.hidden-amount-input')
+
+            $('#unit-dropdown').append(`<li class="select-unit-option" data-value="${selectHabit}"><span>${selectHabit}</span></li>`);
+
+            amountButton.on('click', function () {
+                amountMenu.toggleClass('select-amount-options-visible');
+                $(this).toggleClass('dropdown_amount_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    amountButton.removeClass('dropdown_amount_button_active');
+                    amountMenu.removeClass('select-amount-options-visible');
+                }
+            })
+
+            $(document).on('click', '.select-amount-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-amount-options .select-amount-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                amountButton.html($(this).children('span').text())
+                amountInput.val($(this).attr('data-value'))
+                amountMenu.removeClass('select-amount-options-visible')
+
+                collectData()
+            });
+
+            // Select unit button
+
+            const unitButton = $('.select-unit-button')
+            const unitMenu = $('.select-unit-options')
+            const unitInput = $('.hidden-unit-input')
+
+            unitButton.on('click', function () {
+                unitMenu.toggleClass('select-unit-options-visible');
+                $(this).toggleClass('dropdown_unit_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    amountButton.removeClass('dropdown_unit_button_active');
+                    amountMenu.removeClass('select-unit-options-visible');
+                }
+            })
+
+            function updateUnits(habitName) {
+                const habit = userHabits.get(habitName)
+                console.log('updateUnits: [userHabits] ' + userHabits)
+                console.log('updateUnits: [habit] ' + habit)
+                
+                const firstUnit = habit.unitIds[0];
+                console.log('updateUnits: [firstUnit] ' + firstUnit)
+                const firstUnitName = units.get(firstUnit);
+
+                console.log('updateUnits: [firstUnitName] ' + firstUnitName)
+
+                unitInput.empty();
+                unitButton.html(firstUnitName)
+                unitInput.val(firstUnitName);
+
+                $('#unit-dropdown').empty();
+                $.each(habit.unitIds, function (id, unitId) {
+                    const unitName = units.get(unitId);
+                    console.log(unitName);
+                    $('#unit-dropdown').append(`<li class="select-unit-option" data-value="${unitName}"><span>${unitName}</span></li>`);
+                })
+            }
+
+            $(document).on('click', '.select-unit-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-unit-options .select-unit-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                unitButton.html($(this).children('span').text())
+                unitInput.val($(this).attr('data-value'))
+                unitMenu.removeClass('select-unit-options-visible')
+
+                collectData()
+            });
+
+            // Other
+
+            function collectData() {
+                var habitName = $(".hidden-habit-input").val();
+                const rawAmountValue = parseInt($("#amount").val(), 10);
+                const absAmountValue = Math.abs(rawAmountValue)
+                $("#amount").val(absAmountValue);
+                const unitId = getKeyByValue(units, unitInput.val());
+                const date = $("#date_input").val();
+
+                const data = {
+                    habitId: userHabits.get(habitName).id,
+                    progressValue: absAmountValue,
+                    unitId: unitId,
+                    date: date,
+                    description: $("#text").val(),
+                };
+                Object.keys(data).forEach(
+                    (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
+                );
+                if (data.habitId && data.progressValue && data.unitId) {
+                    mainButton.text = "Записать";
+                    enableSubmit(true);
+                } else {
+                    enableSubmit(false);
+                }
+
+                console.log(data)
+
+                return data;
+            }
+
+            function getKeyByValue(map, searchValue) {
+                let foundKey = null;
+                map.forEach((value, key) => {
+                    if (value === searchValue) {
+                        foundKey = key;
+                    }
+                });
+                return foundKey;
+            }
+
+            function formatDate(date) {
+                var d = new Date(date),
+                    month = "" + (d.getMonth() + 1),
+                    day = "" + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2) month = "0" + month;
+                if (day.length < 2) day = "0" + day;
+
+                return [year, month, day].join("-");
+            }
+
+            $("#custom_input").on("input", collectData);
+            $("#amount").on("input", collectData);
+            $("#text").on("input", collectData);
+            $("#date_input").val(formatDate(new Date()));
+            $("#date_input").on("change", collectData);
+
+            mainButton.enable();
+            mainButton.onClick(function () {
+                window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+            });
+
+            function enableSubmit(activate) {
+                console.log("enableSubmit: " + activate)
+                if (activate) {
+                    mainButton.show();
+                } else {
+                    mainButton.hide();
+                }
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <dotlottie-player src="../../images/write.json"
+        background="transparent"
+        speed="1"
+        style="width: 100%; height: 100px; text-align: center;"
+        loop
+        autoplay>
+    </dotlottie-player>
+
+    <form class="form">
+        <div class="field-wrapper">
+            <span class="label">Выбрать привычку</span>
+            <button class="select-habit-button" type="button">Выберите привычку</button>
+        </div>
+        <ul id="habit-dropdown" class="select-habit-options"></ul>
+
+        <label class="hidden-habit-input-label" for="select-habit-value">
+            <input id="select-habit-value" class="hidden-habit-input" type="text" name="select-habit" value="" />
+        </label>
+
+        <div class="field-wrapper">
+            <label class="label">Прогресс</label>
+        </div>
+
+        <div class="field-wrapper">
+            <label for="amount" class="label"></label>
+            <input type="number" id="amount" name="amount" placeholder="Число" class="text-field" />
+        </div>
+
+        <div class="field-wrapper">
+            <button class="select-unit-button" type="button">Единицы</button>
+            <ul id="unit-dropdown" class="select-unit-options"></ul>
+            <label class="hidden-unit-input-label" for="select-unit-value">
+                <input id="select-unit-value" class="hidden-unit-input" type="text" name="select-unit" value="" />
+            </label>
+        </div>
+        <div class="field-wrapper">
+            <label for="amount" class="label">Дата</label>
+            <input type="date" id="date_input" class="text-field">
+        </div>
+        <div class="field-wrapper">
+            <label for="text" class="label">Комментарий</label>
+            <textarea id="text" name="text" placeholder="Сделать заметку" rows="3" class="text-field"></textarea>
+        </div>
+    </form>
+</body>
+
+</html>

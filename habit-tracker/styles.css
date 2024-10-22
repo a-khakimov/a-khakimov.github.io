@@ -1,0 +1,648 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.form {
+  padding: 20px;
+}
+
+.field-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+}
+
+.label {
+  text-transform: uppercase;
+  font-size: 12px;
+  padding-bottom: 5px;
+}
+
+/* Habit name */
+
+.custom-habit {
+  display: none;
+}
+
+.select-habit-button {
+  background-color: var(--tg-theme-secondary-bg-color);
+  font-size: 18px;
+  color: var(--tg-theme-text-color);
+  text-align: left;
+
+  width: 100%;
+  margin: 0;
+  padding: 10px 20px;
+
+  border: none;
+  border-radius: 8px;
+}
+
+.hidden-habit-input-label {
+  display: none;
+}
+
+.select-habit-options {
+  background-color: var(--tg-theme-bg-color);
+  /*background-color: #fff;*/
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  margin: 0;
+  padding: 20px;
+
+  list-style: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: 200ms ease;
+
+  z-index: 10;
+}
+
+.select-habit-options-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.select-habit-option {
+  background-color: var(--tg-theme-secondary-bg-color);
+  /*background-color: #f4f4f5;*/
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--tg-theme-bg-color);
+  cursor: pointer;
+}
+
+.select-habit-option:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.select-habit-option:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.select-habit-option.selected {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.select-habit-option input:checked {
+  text-decoration: underline;
+}
+
+/* Amount */
+.custom-amount {
+  display: none;
+}
+
+.select-amount-button {
+  background-color: var(--tg-theme-secondary-bg-color);
+  font-size: 18px;
+  color: var(--tg-theme-text-color);
+  text-align: left;
+
+  width: 100%;
+  margin: 0;
+  padding: 10px 20px;
+
+  border: none;
+  border-radius: 8px;
+}
+
+.hidden-amount-input-label {
+  display: none;
+}
+
+.select-amount-options {
+  background-color: var(--tg-theme-bg-color);
+  /*background-color: #fff;*/
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  margin: 0;
+  padding: 20px;
+
+  list-style: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: 200ms ease;
+
+  z-index: 10;
+}
+
+.select-amount-options-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.select-amount-option {
+  background-color: var(--tg-theme-secondary-bg-color);
+  /*background-color: #f4f4f5;*/
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--tg-theme-bg-color);
+  cursor: pointer;
+}
+
+.select-amount-option:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.select-amount-option:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.select-amount-option.selected {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.select-amount-option input:checked {
+  text-decoration: underline;
+}
+
+/* Unit */
+.custom-unit {
+  display: none;
+}
+
+.select-unit-button {
+  background-color: var(--tg-theme-secondary-bg-color);
+  font-size: 18px;
+  color: var(--tg-theme-text-color);
+  text-align: left;
+
+  width: 100%;
+  margin: 0;
+  padding: 10px 20px;
+
+  border: none;
+  border-radius: 8px;
+}
+
+.hidden-unit-input-label {
+  display: none;
+}
+
+.select-unit-options {
+  background-color: var(--tg-theme-bg-color);
+  /*background-color: #fff;*/
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  margin: 0;
+  padding: 20px;
+
+  list-style: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: 200ms ease;
+
+  z-index: 10;
+}
+
+.select-unit-options-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.select-unit-option {
+  background-color: var(--tg-theme-secondary-bg-color);
+  /*background-color: #f4f4f5;*/
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--tg-theme-bg-color);
+  cursor: pointer;
+}
+
+.select-unit-option:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.select-unit-option:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.select-unit-option.selected {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.select-unit-option input:checked {
+  text-decoration: underline;
+}
+
+/* Period */
+.custom-period {
+  display: none;
+}
+
+.select-period-button {
+  background-color: var(--tg-theme-secondary-bg-color);
+  font-size: 18px;
+  color: var(--tg-theme-text-color);
+  text-align: left;
+
+  width: 100%;
+  margin: 0;
+  padding: 10px 20px;
+
+  border: none;
+  border-radius: 8px;
+}
+
+.hidden-period-input-label {
+  display: none;
+}
+
+.select-period-options {
+  background-color: var(--tg-theme-bg-color);
+  /*background-color: #fff;*/
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  margin: 0;
+  padding: 20px;
+
+  list-style: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: 200ms ease;
+
+  z-index: 10;
+}
+
+.select-period-options-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.select-period-option {
+  background-color: var(--tg-theme-secondary-bg-color);
+  /*background-color: #f4f4f5;*/
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--tg-theme-bg-color);
+  cursor: pointer;
+}
+
+.select-period-option:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.select-period-option:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.select-period-option.selected {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.select-period-option input:checked {
+  text-decoration: underline;
+}
+
+.text-field {
+  background-color: var(--tg-theme-secondary-bg-color);
+
+  font-size: 18px;
+  color: var(--tg-theme-text-color);
+
+  width: 100%;
+  padding: 10px 20px;
+
+  border: none;
+  border-radius: 8px;
+
+  box-sizing: border-box;
+
+  outline: 0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.radio-input-label {
+  position: relative;
+
+  border-bottom: 1px solid var(--tg-theme-bg-color);
+
+  overflow: hidden;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.radio-input-label:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.radio-input-label:first-of-type {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.radio-input-label:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.radio-input {
+  position: absolute;
+  left: -9999px;
+}
+
+.radio-input-text {
+  font-size: 18px;
+  color: var(--tg-theme-text-color);
+
+  display: inline-flex;
+  background-color: var(--tg-theme-secondary-bg-color);
+
+  width: 100%;
+  padding: 10px 20px;
+
+  transition: 0.25s ease;
+}
+
+.radio-input:checked + .radio-input-text {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.button-label {
+  position: relative;
+  text-align: center;
+  width: 40px;
+  height: 40px;
+  padding-left: 15px;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  position: relative;
+  text-align: center;
+  align-self: center;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.checkbox-label input:checked ~ .checkmark::after {
+  content: '↩️';
+}
+
+.checkbox-label input:checked ~ .checkmark b {
+  display: none;
+}
+
+.report-buttons {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--tg-theme-bg-color);
+}
+
+.report-input-label {
+  position: relative;
+  width: 100%;
+
+  overflow: hidden;
+}
+
+.report-input-label span {
+  background-color: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-text-color);
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 20px;
+  box-sizing: border-box;
+}
+
+.report-buttons .report-input-label:first-child span {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 1px solid var(--tg-theme-bg-color);
+}
+
+.report-buttons .report-input-label:last-child span {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.report-input-label input:checked + span {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.category-select {
+  display: none;
+}
+
+.habit-card {
+  display: flex; /* Используем flexbox для выравнивания */
+  justify-content: space-between; /* Раздвигаем содержимое на обе стороны */
+  align-items: center; /* Центрируем по вертикали */
+  border: 1px solid var(--tg-theme-section-separator-color);
+  color: var(--tg-theme-header-bg-color);
+  line-height: 1; /* Уменьшение расстояния между строками в карточке */
+  padding: 5px;
+  margin: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.habit-card h4 {
+  margin-top: 5px; /* Уменьшение расстояния между заголовком и верхней границей карточки */
+  margin-bottom: 5px;
+  color: var(--tg-theme-text-color);
+}
+
+.habit-card p {
+  margin: 5px 0;
+  color: var(--tg-theme-subtitle-text-color);
+}
+
+.habit-content {
+  flex-grow: 1; /* Позволяет текстовому контенту занимать доступное пространство */
+}
+
+.checkbox-label {
+  display: flex; /* Используем flex для чекбокса и иконки */
+  align-items: center; /* Центрируем по вертикали */
+}
+
+/* REPORT */
+
+#cal-heatmap-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  /* border: 0.05em solid rgb(213, 131, 131); */
+}
+
+#cal-heatmap {
+  /* border: 0.05em solid rgb(54, 100, 152); */
+  width: auto;
+  max-width: 100%;
+}
+
+#habit-name-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  /* border: 0.05em solid rgb(213, 131, 131); */
+}
+
+#habit-info-container {
+  display: grid;
+  justify-content: left;
+  padding-left: 5%;
+  width: 100%;
+  height: auto;
+  /* border: 0.05em solid rgb(213, 131, 131); */
+}
+
+#habit-name {
+  width: auto;
+  font-size: 18px;
+  max-width: 100%;
+  color: var(--tg-theme-text-color);
+}
+
+#chart-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  overflow-x: hidden; /* Убрать горизонтальную прокрутку, если она появится */
+  /* border: 0.05em solid rgb(213, 131, 131); */
+}
+
+canvas {
+  width: auto;
+  max-width: 100%;
+  /* border: 0.05em solid rgb(113, 131, 131); */
+}
+
+/* Визуальный разделитель: линия между блоками */
+.section-divider {
+  width: 90%;
+  border-top: 1px solid; /* Легкая линия разделителя */
+  margin: 10px 10px; /* Отступы сверху и снизу */
+  padding-left: 5%;
+  color: #aaa;
+}
+
+.report-label {
+  font-size: 14px;
+  padding-bottom: 2px;
+  margin-bottom: 2px;
+  padding-left: 0%;
+  color: var(--tg-theme-text-color);
+}
+
+.habit-logs-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 0.1px solid var(--tg-theme-section-separator-color);
+  color: var(--tg-theme-header-bg-color);
+  line-height: 1;
+  padding: 2px;
+  margin: 2px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+}
+
+.habit-logs-card p {
+  margin: 0px 0;
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--tg-theme-subtitle-text-color);
+}
+
+.habit-logs-content {
+  flex-grow: 1;
+}

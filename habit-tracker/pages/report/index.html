@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta
+      charset="UTF-8"
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1"
+    />
+    <title>Трекер привычек</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../styles.css" />
+    <script src="../../js/dropDowns.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script
+      src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"
+      type="module"
+    ></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/cal-heatmap/dist/plugins/Tooltip.min.js"></script>
+    <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-autocolors"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css"
+    />
+    <script>
+      // https://dev.to/ajaykrupalk/github-like-contribution-heatmap-in-js-4201
+
+      $(document).ready(function () {
+        const apiUrl = "https://ainur-khakimov.ru/habit-tracker";
+        const frontUrl = "https://blog.ainur-khakimov.ru/habit-tracker";
+        const mainButton = window.Telegram.WebApp.MainButton;
+        const colorScheme = window.Telegram.WebApp.colorScheme;
+        const searchParams = new URLSearchParams(window.location.search);
+        const userId = searchParams.get("userId");
+        const habitId = searchParams.get("habitId");
+
+        const currentDate = new Date();
+        const startOfLastMonth = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          1
+        );
+
+        const lastMonth = new Date();
+        lastMonth.setMonth(currentDate.getMonth() - 1);
+
+        mainButton.text = "Назад";
+        mainButton.enable();
+        mainButton.show();
+        mainButton.onClick(function () {
+          window.history.back();
+        });
+
+        let delayed;
+        const animation = {
+          onComplete: () => {
+            delayed = true;
+          },
+          delay: (context) => {
+            let delay = 0;
+            if (
+              context.type === "data" &&
+              context.mode === "default" &&
+              !delayed
+            ) {
+              delay = context.dataIndex * 10 + context.datasetIndex * 1;
+            }
+            return delay;
+          },
+        };
+
+        const ctx = document.getElementById("myChart");
+        const cal = new CalHeatmap();
+
+        fetch(`${apiUrl}/api/habit/log/${userId}/${habitId}`)
+          .then((response) => response.json())
+          .then((habitLogData) => {
+            console.info(habitLogData);
+            if (!habitLogData.error) {
+              fetch(`${apiUrl}/api/habit/${userId}/${habitId}`)
+                .then((response) => response.json())
+                .then((habitData) => {
+                  console.info(habitData);
+                  if (!habitData.error) {
+                    habit = habitData.payload;
+                    console.info(habit);
+                    document.getElementById("habit-name").textContent =
+                      habit.name;
+                    document.getElementById("habit-goal").textContent =
+                      "Цель: " + habit.goal;
+                    // document.getElementById("habit-average").textContent =
+                    //   "Цель: " + habit.goal;
+                    // document.getElementById("habit-percentage").textContent =
+                    //   "Цель: " + habit.goal;
+
+                    const habitLogValues = habitLogData.payload.values;
+
+                    const sortedLogValues = habitLogValues.sort(
+                      (b, a) => new Date(a.wroteAt) - new Date(b.wroteAt)
+                    );
+
+                    $.each(sortedLogValues, function (index, value) {
+                      const card = makeCard(value);
+                      $("#habit-logs-list").append(card);
+                    });
+
+                    cal.paint(
+                      {
+                        itemSelector: "#cal-heatmap",
+                        animationDuration: 200,
+                        range: 2,
+                        scale: {
+                          color: {
+                            domain: [0, habit.amount],
+                            type: "diverging",
+                            scheme: "BuRd",
+                            pivot: 0,
+                            symmetric: true,
+                          },
+                        },
+                        date: {
+                          locale: "ru",
+                          start: startOfLastMonth,
+                          highlight: [currentDate],
+                        },
+                        data: {
+                          source: habitLogValues,
+                          x: "wroteAt",
+                          y: "progressValue",
+                        },
+                        verticalOrientation: false,
+                        theme: colorScheme,
+                        legend: [0, habit.amount],
+                        domain: {
+                          dynamicDimension: true,
+                          gutter: 0,
+                          sort: "asc",
+                          label: {
+                            align: "center",
+                            position: "bottom",
+                            text: "YYYY MMM",
+                          },
+                          type: "month",
+                        },
+                        subDomain: {
+                          type: "day",
+                          width: 20,
+                          height: 20,
+                          radius: 3,
+                          label: "D",
+                          sort: "asc",
+                        },
+                      },
+                      [
+                        [
+                          Tooltip,
+                          {
+                            text: function (date, value, dayjsDate) {
+                              return (
+                                (value ? value : "0") +
+                                " " +
+                                habit.unit.name +
+                                " - " +
+                                dayjsDate.format("MMMM D, YYYY")
+                              );
+                            },
+                          },
+                        ],
+                      ]
+                    );
+
+                    cal.on("fill", () => {
+                      console.log("New data have been loaded!");
+                    });
+
+                    // Функция для форматирования даты в "YYYY-MM-DD"
+                    function formatDate(date) {
+                      return date.toISOString().split("T")[0];
+                    }
+
+                    // Генерируем массив всех дней за последний месяц
+                    let dateLabels = [];
+                    for (
+                      let d = new Date(lastMonth);
+                      d <= currentDate;
+                      d.setDate(d.getDate() + 1)
+                    ) {
+                      dateLabels.push(formatDate(new Date(d)));
+                    }
+
+                    let progressByDate = {};
+                    const progressValues = habitLogValues.forEach((entry) => {
+                      const date = entry.wroteAt;
+                      if (progressByDate[date]) {
+                        progressByDate[date] += entry.progressValue; // Суммируем, если в один день несколько записей
+                      } else {
+                        progressByDate[date] = entry.progressValue;
+                      }
+                    });
+
+                    const data11 = dateLabels.map(
+                      (date) => progressByDate[date] || 0
+                    );
+                    const data12 = dateLabels.map((date) => habit.amount / 7);
+                    console.log(dateLabels);
+                    console.log(data11);
+
+                    new Chart(ctx, {
+                      locale: "ru-RU",
+                      data: {
+                        datasets: [
+                          {
+                            type: "line",
+                            label: "Цель",
+                            pointStyle: "line",
+                            fill: false,
+                            data: data12,
+                            borderWidth: 2,
+                            tension: 0.1,
+                          },
+                          {
+                            type: "bar",
+                            label: "Прогресс",
+                            data: data11,
+                            borderWidth: 1,
+                          },
+                        ],
+                        labels: dateLabels,
+                      },
+                      options: {
+                        animation,
+                        plugins: {
+                          autocolors: {
+                            enabled: false,
+                          },
+                          title: {
+                            display: true,
+                            text: "За последний месяц",
+                            position: "bottom",
+                            font: {
+                              size: 10,
+                              family: "Ubuntu",
+                            },
+                          },
+                          legend: {
+                            display: false,
+                            position: "bottom",
+                            labels: {
+                              font: {
+                                size: 8,
+                                family: "Ubuntu",
+                              },
+                            },
+                          },
+                        },
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: habit.amount * 1.2,
+                            ticks: {
+                              autoSkip: true, // Включаем автоматическое пропускание меток
+                              display: true,
+                              crossAlign: "center",
+                              maxRotation: 0,
+                            },
+                          },
+                          x: {
+                            beginAtZero: true,
+                            ticks: {
+                              //autoSkip: true,  // Включаем автоматическое пропускание меток
+                              //maxTicksLimit: 2, // Максимальное количество меток, которое будет отображено
+                              display: false, // Скрыть все метки на оси X
+                              crossAlign: "center",
+                              maxRotation: 0,
+                              stepSize: 0.1,
+                            },
+                          },
+                        },
+                      },
+                    });
+                  } else {
+                    console.error(data);
+                  }
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            } else {
+              console.error(`${data.error}: ${data.description}`);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+        function makeCard(log) {
+          return `
+            <div class="habit-logs-card" data-id="${log.id}">
+              <div class="habit-log-content">
+                  <p>${
+                    log.wroteAt
+                  } - ${log.progressValue} ${log.unit.name} ${log.description ? "(" + log.description + ")" : ""}</p>
+              </div>
+            </div>`;
+        }
+
+        function collectData() {}
+      });
+    </script>
+  </head>
+
+  <body>
+    <form class="form">
+      <div id="habit-name-container">
+        <div id="habit-name" class="label"></div>
+      </div>
+    </form>
+    <div class="section-divider"></div>
+    <div id="cal-heatmap-container">
+      <div id="cal-heatmap"></div>
+    </div>
+    <div class="section-divider"></div>
+    <div id="habit-info-container">
+      <div id="habit-goal" class="report-label"></div>
+      <!-- <div id="habit-average" class="report-label"></div>
+      <div id="habit-percentage" class="report-label"></div> -->
+    </div>
+    <div class="section-divider"></div>
+    <div id="habit-info-container">
+      <div class="report-label">Последние записи:</div>
+      <div id="habit-logs-list"></div>
+    </div>
+  </body>
+</html>

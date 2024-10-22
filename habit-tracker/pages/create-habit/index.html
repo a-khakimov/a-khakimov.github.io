@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Трекер привычек</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../styles.css" />
+    <script src="../../js/dropDowns.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+    <script>
+        
+        // todo: fetch from backend
+        const habits = [
+            "Отжимание",
+            "Пение",
+            "Медитация",
+            "Ходить в зал",
+
+            // Должно быть последним
+            "Создать новую привычку"
+        ]
+
+        $(document).ready(function () {
+
+            const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
+            const mainButton = window.Telegram.WebApp.MainButton;
+            const searchParams = new URLSearchParams(window.location.search);
+            const chatId = searchParams.get("chatId");
+            const userId = searchParams.get("userId");
+            
+            // Select habit button
+            const dropdownButton = $('.select-habit-button')
+            const dropdownMenu = $('.select-habit-options')
+            const dropdownInput = $('.hidden-habit-input')
+
+            dropdownButton.on('click', function () {
+                console.log("Click dropdownButton")
+                dropdownMenu.toggleClass('select-habit-options-visible');
+                $(this).toggleClass('dropdown_habit_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    dropdownButton.removeClass('dropdown_habit_button_active');
+                    dropdownMenu.removeClass('select-habit-options-visible');
+                }
+            })
+
+            $.each(habits, function (key, str) {
+                console.log(str)
+                if (str === 'Создать новую привычку') {
+                    $('#habit-dropdown').append(`<li class="select-habit-option" data-value="${str}"><span>${str}</span></li>`)
+                } else {
+                    $('#habit-dropdown').append(
+                        `<li class="select-habit-option" data-value="${str}">
+                            <span>${str}</span>
+                        </li>`
+                    )
+                }
+            })
+
+            $(document).on('click', '.select-habit-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-habit-options .select-habit-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                dropdownButton.html($(this).children('span').text())
+                dropdownInput.val($(this).attr('data-value'))
+                dropdownMenu.removeClass('select-habit-options-visible')
+
+                if (dropdownInput.val() === 'Создать новую привычку') {
+                    $(".custom-habit").show();
+                } else {
+                    $(".custom-habit").hide();
+                }
+
+                collectData()
+            });
+
+
+            // Select amount button
+
+            const amountButton = $('.select-amount-button')
+            const amountMenu = $('.select-amount-options')
+            const amountInput = $('.hidden-amount-input')
+
+            amountButton.on('click', function () {
+                amountMenu.toggleClass('select-amount-options-visible');
+                $(this).toggleClass('dropdown_amount_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    amountButton.removeClass('dropdown_amount_button_active');
+                    amountMenu.removeClass('select-amount-options-visible');
+                }
+            })
+
+            const amounts = [ "1", "2", "3", "4" ]
+            $.each(amounts, function (key, str) {
+                console.log(str)
+                $('#amount-dropdown').append(
+                    `<li class="select-amount-option" data-value="${str}">
+                        <span>${str}</span>
+                    </li>`
+                )
+            })
+
+            $(document).on('click', '.select-amount-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-amount-options .select-amount-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                amountButton.html($(this).children('span').text())
+                amountInput.val($(this).attr('data-value'))
+                amountMenu.removeClass('select-amount-options-visible')
+
+                collectData()
+            });
+
+            // Select unit button
+
+            const unitButton = $('.select-unit-button')
+            const unitMenu = $('.select-unit-options')
+            const unitInput = $('.hidden-unit-input')
+
+            unitButton.on('click', function () {
+                unitMenu.toggleClass('select-unit-options-visible');
+                $(this).toggleClass('dropdown_unit_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    amountButton.removeClass('dropdown_unit_button_active');
+                    amountMenu.removeClass('select-unit-options-visible');
+                }
+            })
+
+            let units = new Map();
+            
+            fetch(`${apiUrl}/api/habit/units/${userId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    $.each(data.payload, function(index, category) {
+                        $.each(category.units, function(i, unit) {
+                            units.set(unit.name, unit.id);
+                            console.log(unit.name);
+                            $('#unit-dropdown').append(
+                                `<li class="select-unit-option" data-value="${unit.name}">
+                                    <span>${unit.name}</span>
+                                </li>`
+                            );
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error(error);
+                    $('#unit-dropdown').append(
+                        `<li class="select-unit-option" data-value="Не удалось загрузить">
+                            <span>Не удалось загрузить</span>
+                        </li>`
+                    );
+                });
+
+            $(document).on('click', '.select-unit-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-unit-options .select-unit-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                unitButton.html($(this).children('span').text())
+                unitInput.val($(this).attr('data-value'))
+                unitMenu.removeClass('select-unit-options-visible')
+
+                collectData()
+            });
+
+            // Select period button
+
+            const periodButton = $('.select-period-button')
+            const periodMenu = $('.select-period-options')
+            const periodInput = $('.hidden-period-input')
+
+            periodButton.on('click', function () {
+                periodMenu.toggleClass('select-period-options-visible');
+                $(this).toggleClass('dropdown_period_button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    periodButton.removeClass('dropdown_period_button_active');
+                    periodMenu.removeClass('select-period-options-visible');
+                }
+            })
+
+            const periods = [ "В день", "В неделю", "В месяц"]
+            $.each(periods, function (key, str) {
+                console.log(str)
+                $('#period-dropdown').append(
+                    `<li class="select-period-option" data-value="${str}">
+                        <span>${str}</span>
+                    </li>`
+                )
+            })
+
+            $(document).on('click', '.select-period-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-period-options .select-period-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                periodButton.html($(this).children('span').text())
+                periodInput.val($(this).attr('data-value'))
+                periodMenu.removeClass('select-period-options-visible')
+
+                collectData()
+            });
+
+            // Other
+
+            function collectData() {
+                var habit = $(".hidden-habit-input").val();
+                if (habit === 'Создать новую привычку') {
+                    habit = $("#custom_input").val();
+                }
+                const rawAmountValue = parseInt($("#amount").val(), 10);
+                const absAmountValue = Math.abs(rawAmountValue)
+                $("#amount").val(absAmountValue);
+                const unitId = units.get(unitInput.val());
+                const period = periodInput.val();
+
+                const data = {
+                    habitName: habit,
+                    amount: absAmountValue,
+                    unitId: unitId,
+                    period: period,
+                    description: $("#text").val(),
+                    timeOffset: new Date().getTimezoneOffset(),
+                };
+                Object.keys(data).forEach(
+                    (key) => (data[key] = data[key] === "any" || data[key] === "" ? null : data[key])
+                );
+                if (data.habitName && data.amount && data.unitId && data.period) {
+                    mainButton.text = "Создать";
+                    enableSubmit(true);
+                } else {
+                    enableSubmit(false);
+                }
+                return data;
+            }
+
+            function formatDate(date) {
+                var d = new Date(date),
+                    month = "" + (d.getMonth() + 1),
+                    day = "" + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2) month = "0" + month;
+                if (day.length < 2) day = "0" + day;
+
+                return [year, month, day].join("-");
+            }
+
+            $("#custom_input").on("input", collectData);
+            $("#amount").on("input", collectData);
+
+            mainButton.enable();
+            mainButton.onClick(function () {
+                window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+            });
+
+            function enableSubmit(activate) {
+                console.log("enableSubmit: " + activate)
+                if (activate) {
+                    mainButton.show();
+                } else {
+                    mainButton.hide();
+                }
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <!--
+    <div id="cal-heatmap"></div>
+    -->
+    <dotlottie-player src="../../images/bicycle.json"
+        background="transparent"
+        speed="1"
+        style="width: 100%; height: 100px; text-align: center;"
+        loop
+        autoplay>
+    </dotlottie-player>
+
+    <form class="form">
+        <div class="field-wrapper">
+            <span class="label">Выбрать привычку</span>
+            <button class="select-habit-button" type="button">Привычка</button>
+        </div>
+        <ul id="habit-dropdown" class="select-habit-options"></ul>
+
+        <label class="hidden-habit-input-label" for="select-habit-value">
+            <input id="select-habit-value" class="hidden-habit-input" type="text" name="select-habit" value="" />
+        </label>
+
+        <div class="field-wrapper custom-habit">
+            <label id="custom_label" for="custom_input" class="label">Новая привычка</label>
+            <input id="custom_input" type="text" name="custom" placeholder="Название" class="text-field" />
+        </div>
+
+
+        <div class="field-wrapper">
+            <label class="label">Цель</label>
+        </div>
+
+        <div class="field-wrapper">
+            <label for="amount" class="label"></label>
+            <input type="number" id="amount" name="amount" placeholder="Количество" class="text-field" />
+        </div>
+
+        <!--
+        <button class="select-amount-button" type="button">1</button>
+        <ul id="amount-dropdown" class="select-amount-options"></ul>
+        <label class="hidden-amount-input-label" for="select-amount-value">
+            <input id="select-amount-value" class="hidden-amount-input" type="text" name="select-amount" value="" />
+        </label>
+        -->
+
+        <div class="field-wrapper">
+        <button class="select-unit-button" type="button">Единицы</button>
+        <ul id="unit-dropdown" class="select-unit-options"></ul>
+        <label class="hidden-unit-input-label" for="select-unit-value">
+            <input id="select-unit-value" class="hidden-unit-input" type="text" name="select-unit" value="" />
+        </label>
+        </div>
+
+        <div class="field-wrapper">
+            <button class="select-period-button" type="button">Период</button>
+            <ul id="period-dropdown" class="select-period-options"></ul>
+            <label class="hidden-period-input-label" for="select-period-value">
+                <input id="select-period-value" class="hidden-period-input" type="text" name="select-period" value="" />
+            </label>
+        </div>
+        <div class="field-wrapper">
+            <label for="text" class="label">Комментарий</label>
+            <textarea id="text" name="text" placeholder="Комментарий" rows="3" class="text-field"></textarea>
+        </div>
+    </form>
+</body>
+
+</html>

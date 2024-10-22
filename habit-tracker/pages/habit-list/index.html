@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Трекер привычек</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../styles.css" />
+    <script src="../../js/dropDowns.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+    <script>
+
+      $(document).ready(function () {
+        const apiUrl = "https://ainur-khakimov.ru/habit-tracker"
+        const mainButton = window.Telegram.WebApp.MainButton;
+        const backButton = window.Telegram.WebApp.BackButton;
+        const searchParams = new URLSearchParams(window.location.search);
+        const userId = searchParams.get("userId");
+
+        backButton.show();
+        backButton.onClick(function () {
+          window.Telegram.WebApp.close();
+        });
+
+        mainButton.text = "Назад";
+        mainButton.enable();
+        mainButton.show();
+        mainButton.onClick(function () {
+          window.Telegram.WebApp.close();
+        });
+
+        fetch(`${apiUrl}/api/habits/${userId}`)
+          .then((response) => response.json())
+          .then((data) => {
+              console.info(data)
+              if (!data.error) {
+                $.each(data.payload, function(index, habit) {
+                  const card = makeCard(habit);
+                  $('#habit-list').append(card); 
+                });
+              } else {
+                console.error(`${data.error}: ${data.description}`);
+                const card = makeErrorCard(data.trackingId);
+                $('#habit-list').append(card);
+              }
+          })
+          .catch((error) => {
+            console.error("AAAAAAAAAAAA");
+            console.error(error);
+            const card = makeErrorCard("");
+            $('#habit-list').append(card);
+          });
+
+        function makeCard(habit) {
+          return `
+            <div class="habit-card" data-id="${habit.id}">
+              <div class="habit-content">
+                  <h4>${habit.name}</h3>
+                  <p>Цель: ${habit.goal}</p>
+                  <p>Прогресс: ${habit.currentProgress}</p>
+              </div>
+              <label class="button-label">
+                <a href="https://blog.ainur-khakimov.ru/habit-tracker/pages/edit-habit/index.html?userId=${userId}&habitId=${habit.id}" class="button">
+                  <b>✏️</b>
+                </a>
+              </label>
+              <div>  </div>
+              <label class="button-label">
+                <a href="https://blog.ainur-khakimov.ru/habit-tracker/pages/report/index.html?userId=${userId}&habitId=${habit.id}" class="button">
+                  <b>📊</b>
+                </a>
+              </label>
+            </div>`;
+        }
+
+        function makeErrorCard(trackingId) {
+          return `
+            <div class="habit-card" data-id="">
+              <div class="habit-content">
+                  <h4>Что-то пошло не так...</h3>
+                  <p>Не удалось загрузить список привычек 😥</p>
+                  <a>Помоги разобраться: ${trackingId}</a>
+              </div>
+            </div>`;
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <dotlottie-player src="../../images/write.json"
+      background="transparent"
+      speed="1"
+      style="width: 100%; height: 100px; text-align: center;"
+      loop
+      autoplay>
+    </dotlottie-player>
+    <div id="habit-list"></div>
+  </body>
+</html>
