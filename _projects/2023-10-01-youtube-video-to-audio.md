@@ -40,6 +40,7 @@ tags: [Telegram, YouTube]
 - Scala
 - Cats Effect 3
 - [Telegramium](https://github.com/apimorphism/telegramium)
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 
 ### Код
 
