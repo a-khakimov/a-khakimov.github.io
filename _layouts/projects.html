@@ -5,7 +5,26 @@ refactor: true
 
 {% include lang.html %}
 
-{% assign projects = site.projects %}
+{% assign projects = site.projects | sort: 'date' | reverse %}
+
+<!-- Get pinned projects on current page -->
+
+{% assign visible_start = paginator.page | minus: 1 | times: paginator.per_page %}
+{% assign visible_end = visible_start | plus: paginator.per_page %}
+
+{% if all_pinned.size > visible_start %}
+  {% if all_pinned.size > visible_end %}
+    {% assign pinned_size = paginator.per_page %}
+  {% else %}
+    {% assign pinned_size = all_pinned.size | minus: visible_start %}
+  {% endif %}
+
+  {% for i in (visible_start..all_pinned.size) limit: pinned_size %}
+    {% assign projects = projects | push: all_pinned[i] %}
+  {% endfor %}
+{% else %}
+  {% assign pinned_size = 0 %}
+{% endif %}
 
 <!-- Get normal projects on current page -->
 
