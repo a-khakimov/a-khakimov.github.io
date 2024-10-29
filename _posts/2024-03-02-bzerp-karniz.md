@@ -3,10 +3,10 @@ layout: post
 title: Однодневный поход на Бзерпинский карниз
 date: 2024-03-02 00:23:30 +0000
 categories: [Походы]
-tags: [Походы, Горы, Фотографии]
+tags: [Бзерпинский карниз, Кавказ, Горы, Фотографии]
+image:
+    path: /assets/img/bzerp/DSC05649_compressed.jpg
 ---
-
-![](assets/img/bzerp/DSC05649_compressed.jpg){: .shadow }
 
 В далеком августе 2022 года ходили на однодневный поход до Бзерпинского карниза и до пика Бзерпи (высота 2483 м). В этом посте хочу поделиться небольшим фотоотчётом.
 
@@ -17,11 +17,11 @@ _[Маршрут](https://yandex.ru/maps/239/sochi/?ll=40.361994%2C43.694624&mod
 
 Поднялись мы через станцию Газпром Альпики Лаура (предварительно купив билеты в заповедник).
 
-![](assets/img/bzerp/DSC05456_compressed.jpg)
+![](assets/img/bzerp/DSC05456_compressed.jpg){: w="500" .shadow }
 
 Выдвинулись рано утром. В начале подъема было довольно туманно.
 
-![](assets/img/bzerp/DSC05487_compressed.jpg)
+![](assets/img/bzerp/DSC05487_compressed.jpg){: w="500" .shadow }
 
 Матрица фотоаппарата поймала пылинку, поэтому часть фотографий чутка подпорчены черными точками. Но кадры все равно получились неплохие!
 
@@ -29,12 +29,11 @@ _[Маршрут](https://yandex.ru/maps/239/sochi/?ll=40.361994%2C43.694624&mod
 
 ![](assets/img/bzerp/DSC05474_compressed.jpg){: .shadow }
 
-
 ![](assets/img/bzerp/DSC05501_compressed.jpg)
 
-![](assets/img/bzerp/DSC05527_compressed.jpg)
+![](assets/img/bzerp/DSC05527_compressed.jpg){: w="500" .shadow }
 
-![](assets/img/bzerp/DSC05475_compressed.jpg)
+![](assets/img/bzerp/DSC05475_compressed.jpg){: w="500" .shadow }
 
 ![](assets/img/bzerp/DSC05525_compressed.jpg)
 
