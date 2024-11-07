@@ -41,12 +41,9 @@ social:
   email: hak.ain@yandex.ru # change to your email address
   links:
     # The first element serves as the copyright owner's link
+    - https://t.me/ainur_khakimov
     - https://github.com/a-khakimov
     - https://www.instagram.com/ainr__
-    - https://t.me/ainur_khakimov
-    # Uncomment below to add more social links
-    # - https://www.facebook.com/username
-    # - https://www.linkedin.com/in/username
 
 # Site Verification Settings
 webmaster_verifications:
