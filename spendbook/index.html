@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Spend book page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    <script src="./js/dropDowns.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.Telegram.WebApp.expand();
+            window.Telegram.WebApp.ready();
+            const mainButton = window.Telegram.WebApp.MainButton;
+            const searchParams = new URLSearchParams(window.location.search);
+            const groupId = searchParams.get("groupId");
+            let categoriesUrl1 = `https://ainur-khakimov.ru/spendbook/categories?groupId=${groupId}`;
+            let categoriesUrl2 = `https://spendbook.ru/spendbook/categories?groupId=${groupId}`;
+            const TIMEOUT = 3000; // 2 секунды
+
+            const dropdownButton = $('.select-button')
+            const dropdownMenu = $('.select-options')
+            const dropdownInput = $('.hidden-input')
+
+            const fetchWithTimeout = (url, timeout) => {
+                return Promise.race([
+                    fetch(url).then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`Request to ${url} failed with status ${response.status}`);
+                        }
+                        return response;
+                    }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), timeout)),
+                ]);
+            };
+
+            const fetchCategories = async () => {
+                try {
+                    const data = await fetchWithTimeout(categoriesUrl1, TIMEOUT);
+                    console.log('Fetched from first URL:', data);
+                    return data;
+                } catch (error) {
+                    console.warn('First URL failed:', error.message);
+                
+                    try {
+                        const fallbackData = await fetchWithTimeout(categoriesUrl2, TIMEOUT);
+                        console.log('Fetched from second URL:', fallbackData);
+                        return fallbackData;
+                    } catch (fallbackError) {
+                        console.error('Second URL also failed:', fallbackError.message);
+                        throw new Error('Both requests failed');
+                    }
+                }
+            };
+
+            dropdownButton.on('click', function () {
+                dropdownMenu.toggleClass('select-options-visible');
+                $(this).toggleClass('dropdown__button_active');
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === 'Escape') {
+                    dropdownButton.removeClass('dropdown__button_active');
+                    dropdownMenu.removeClass('select-options-visible');
+                }
+            })
+
+            fetchCategories()
+                .then((response) => response.json())
+                .then((userCategories) => {
+                    const finalCategories = ['Ввести свою категорию', ...userCategories];
+                    $.each(finalCategories, function (key, str) {
+                        if (str === 'Ввести свою категорию') {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}"><span>${str}</span></li>`
+                            )
+                        } else {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}">
+                                <span>${str}</span>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${str}">
+                                    <span class="checkmark"><b>🗑️</b></span>
+                                </label>
+                               </li>`
+                            )
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error(error);
+                    $.each(categories, function (key, str) {
+                        if (str === 'Ввести свою категорию') {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}"><span>${str}</span></li>`
+                            )
+                        } else {
+                            $('#custom-dropdown').append(
+                                `<li class="select-option" data-value="${str}">
+                                <span>${str}</span>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="option-checkbox" name="category-checkbox" value="${str}">
+                                    <span class="checkmark"><b>🗑️</b></span>
+                                </label>
+                               </li>`
+                            )
+                        }
+                    })
+
+                });
+
+            $(document).on('click', '.select-option', function (event) {
+                if ($(this).attr('disabled')) {
+                    event.preventDefault()
+                    return false
+                }
+
+                $('.select-options .select-option').each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected')
+                    }
+                })
+
+                $(this).addClass('selected')
+                dropdownButton.html($(this).children('span').text())
+                dropdownInput.val($(this).attr('data-value'))
+                dropdownMenu.removeClass('select-options-visible')
+
+                if (dropdownInput.val() === 'Ввести свою категорию') {
+                    $(".custom-category").show();
+                } else {
+                    $(".custom-category").hide();
+                }
+
+                collectData()
+            });
+
+            $(document).on('click', '.checkbox-label', function (event) {
+                event.stopPropagation()
+
+                if ($(this).children('input').is(':checked')) {
+                    $(this).parent().css({ "text-decoration": "line-through" });
+                } else {
+                    $(this).parent().css({ "text-decoration": "inherit" });
+                }
+
+                if ($('input:checkbox[name=category-checkbox]:checked').length) {
+                    $('.select-options .select-option').each(function () {
+                        $(this).attr('disabled', true)
+                    })
+
+                    mainButton.text = "Подтвердить удаление";
+                    enableSubmit(true)
+                } else {
+                    $('.select-options .select-option').each(function () {
+                        $(this).attr('disabled', false)
+                    })
+
+                    enableSubmit(false)
+                }
+            })
+
+            function collectData() {
+                var category = $(".hidden-input").val();
+                if (category === 'Ввести свою категорию') {
+                    category = $("#custom_input").val();
+                }
+                const rawAmountValue = parseInt($("#amount").val(), 10);
+                const absAmountValue = Math.abs(rawAmountValue)
+                $("#amount").val(absAmountValue);
+                const data = {
+                    category: category,
+                    amount: absAmountValue,
+                    description: $("#text").val(),
+                    date: $("#date_input").val(),
+                    timeOffset: new Date().getTimezoneOffset(),
+                };
+                Object.keys(data).forEach(
+                    (key) =>
+                    (data[key] =
+                        data[key] === "any" || data[key] === "" ? null : data[key])
+                );
+                if (data.category && data.amount) {
+                    mainButton.text = "Отправить";
+                    enableSubmit(true);
+                } else {
+                    enableSubmit(false);
+                }
+                return data;
+            }
+
+            function formatDate(date) {
+                var d = new Date(date),
+                    month = "" + (d.getMonth() + 1),
+                    day = "" + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2) month = "0" + month;
+                if (day.length < 2) day = "0" + day;
+
+                return [year, month, day].join("-");
+            }
+
+            $("#date_input").val(formatDate(new Date()));
+
+            $("#custom_input").on("input", collectData);
+            $("#amount").on("input", collectData);
+            $("#date_input").on("change", collectData);
+
+            mainButton.enable();
+            mainButton.onClick(function () {
+                const checkboxes = $('input:checkbox[name=category-checkbox]:checked')
+
+                if (checkboxes.length) {
+                    const arr = []
+
+                    checkboxes.each(function () {
+                        arr.push($(this).val())
+                    });
+
+                    window.Telegram.WebApp.sendData(JSON.stringify(arr));
+                } else {
+                    window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+                }
+            });
+
+            function enableSubmit(activate) {
+                if (activate) {
+                    mainButton.show();
+                } else {
+                    mainButton.hide();
+                }
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <dotlottie-player src="https://lottie.host/31eb8f50-5493-47de-939a-adffa6bd4317/wbaxE0xVId.json"
+        background="transparent" speed="1" style="width: 100%; height: 100px; text-align: center;" loop
+        autoplay></dotlottie-player>
+
+    <form class="form">
+        <div class="field-wrapper">
+            <span class="label">Категория</span>
+            <button class="select-button" type="button">Категория</button>
+        </div>
+        <ul id="custom-dropdown" class="select-options"></ul>
+
+        <label class="hidden-input-label" for="select-value">
+            <input id="select-value" class="hidden-input" type="text" name="select-category" value="" />
+        </label>
+
+        <div class="field-wrapper custom-category">
+            <label id="custom_label" for="custom_input" class="label">Своя категория</label>
+            <input id="custom_input" type="text" name="custom" placeholder="Своя категория" class="text-field" />
+        </div>
+
+        <div class="field-wrapper">
+            <label for="amount" class="label">Сумма траты</label>
+            <input type="number" id="amount" name="amount" placeholder="Сумма" class="text-field" />
+        </div>
+
+        <div class="field-wrapper">
+            <label for="text" class="label">Комментарий</label>
+            <textarea id="text" name="text" placeholder="Комментарий" rows="3" class="text-field"></textarea>
+        </div>
+
+        <div class="field-wrapper">
+            <label for="amount" class="label">Дата</label>
+            <input type="date" id="date_input" class="text-field">
+        </div>
+    </form>
+</body>
+
+</html>

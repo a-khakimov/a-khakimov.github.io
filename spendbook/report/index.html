@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+      <title>Report page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../styles.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="../js/dropDowns.js"></script>
+    <script>
+          const months = [
+              { text: "Январь", value: "1" },
+              { text: "Февраль", value: "2" },
+              { text: "Март", value: "3" },
+              { text: "Апрель", value: "4" },
+              { text: "Май", value: "5" },
+              { text: "Июнь", value: "6" },
+              { text: "Июль", value: "7" },
+              { text: "Август", value: "8" },
+              { text: "Сентябрь", value: "9" },
+              { text: "Октябрь", value: "10" },
+              { text: "Ноябрь", value: "11" },
+              { text: "Декабрь", value: "12" },
+          ];
+
+          $(document).ready(function () {
+              window.Telegram.WebApp.expand();
+              window.Telegram.WebApp.ready();
+
+              const searchParams = new URLSearchParams(window.location.search);
+              const groupId = searchParams.get("groupId");
+              let categoriesUrl = `https://ainur-khakimov.ru/spendbook/categories?groupId=${groupId}`;
+              let categoriesUrl2 = `https://spendbook.ru/spendbook/categories?groupId=${groupId}`;
+              const TIMEOUT = 3000; // 2 секунды
+
+              const fetchWithTimeout = (url, timeout) => {
+                  return Promise.race([
+                      fetch(url).then((response) => {
+                          if (!response.ok) {
+                              throw new Error(`Request to ${url} failed with status ${response.status}`);
+                          }
+                          return response;
+                      }),
+                      new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), timeout)),
+                  ]);
+              };
+
+              const fetchCategories = async () => {
+                  try {
+                      const data = await fetchWithTimeout(categoriesUrl1, TIMEOUT);
+                      console.log('Fetched from first URL:', data);
+                      return data;
+                  } catch (error) {
+                      console.warn('First URL failed:', error.message);
+                  
+                      try {
+                          const fallbackData = await fetchWithTimeout(categoriesUrl2, TIMEOUT);
+                          console.log('Fetched from second URL:', fallbackData);
+                          return fallbackData;
+                      } catch (fallbackError) {
+                          console.error('Second URL also failed:', fallbackError.message);
+                          throw new Error('Both requests failed');
+                      }
+                  }
+              };
+
+              const dropdownInput = $('.hidden-input');
+              let categoriesFromServer;
+
+              $('.custom-select').each(function () {
+                  const dropdownButton = $(this).children('.field-wrapper').children('.select-button');
+                  const dropdownMenu = $(this).children('.select-options');
+
+                  dropdownButton.on('click', function () {
+                      dropdownMenu.toggleClass('select-options-visible');
+                      $(this).toggleClass('dropdown__button_active');
+                  });
+
+                  if (dropdownMenu.attr('id') === 'custom-dropdown') {
+                      dropdownInput.val(new Date().getMonth()+1);
+
+                      const m = new Date().getMonth()+1
+                      const currentMonth = months.find((item) => item.value === m.toString())
+                      dropdownButton.html(currentMonth.text)
+
+                      $.each(months, function (key, obj) {
+                          dropdownMenu.append(`<li class="select-option" value="${obj.value}">${obj.text}</li>`);
+                      });
+                  }
+
+                  if (dropdownMenu.attr('id') === 'category-dropdown') {
+                      fetchCategories()   
+                          .then((response) => response.json())
+                          .then((userCategories) => {
+                              categoriesFromServer = userCategories
+
+                              $.each(userCategories, function (key, str) {
+                                  dropdownMenu.append(
+                                      `<li class="select-option" value="${str}">
+                                        ${str}
+                                       </li>`
+                                  )
+                              });
+                          })
+                          .catch((error) => {
+                              console.error(error);
+                              categoriesFromServer = categories
+
+                              $.each(categories, function (key, str) {
+                                  if (str !== 'Ввести свою категорию') {
+                                      dropdownMenu.append(
+                                          `<li class="select-option" value="${str}">${str}</li>`
+                                      )
+                                  }
+                              })
+                          });
+                  }
+
+                  dropdownMenu.on('click', '.select-option', function() {
+                      dropdownMenu.children('.select-option').each(function (){
+                          if ($(this).hasClass('selected')) {
+                              $(this).removeClass('selected')
+                          }
+                      })
+
+                      $(this).addClass('selected')
+                      dropdownButton.html($(this).text())
+                      dropdownInput.val($(this).attr('value'))
+                      dropdownMenu.removeClass('select-options-visible')
+
+                      collectData();
+                  });
+
+
+                  $(document).on('keydown', function (e) {
+                      if( e.key === 'Tab' || e.key === 'Escape' ) {
+                          dropdownButton.removeClass('dropdown__button_active');
+                          dropdownMenu.removeClass('select-options-visible');
+                      }
+                  })
+              });
+
+              $('.report-input-label').on('click', function () {
+                  const currentReport = $(this).children('input[name="report"]:checked').val();
+
+                  if (currentReport === 'category') {
+                      if (categoriesFromServer?.length) {
+                          dropdownInput.val(categoriesFromServer[0]);
+
+                          $('.category-select .field-wrapper button').html(categoriesFromServer[0])
+                      }
+
+                      $('.category-select').show(300)
+                      $('.month-select').hide(300)
+                  }
+
+                  if (currentReport === 'month') {
+                      dropdownInput.val(new Date().getMonth()+1);
+
+                      const m = new Date().getMonth()+1
+                      const currentMonth = months.find((item) => item.value === m.toString())
+                      $('.month-select .field-wrapper button').html(currentMonth.text)
+
+                      $('.category-select').hide(300)
+                      $('.month-select').show(300)
+                  }
+              });
+
+
+              function collectData() {
+                  const data = {
+                      year: parseInt($('input[name="year"]:checked').val(), 10),
+                      colorScheme: window.Telegram.WebApp.colorScheme,
+                  };
+
+                  const currentReport = $('input[name="report"]:checked').val()
+
+                  if (currentReport === 'category') {
+                      data.category = dropdownInput.val()
+                  } else if (currentReport === 'month') {
+                      data.month = parseInt(dropdownInput.val(), 10)
+                  }
+
+                  Object.keys(data).forEach(
+                      (key) =>
+                          (data[key] =
+                              data[key] === "any" || data[key] === "" ? null : data[key])
+                  );
+
+                  console.log(data, currentReport)
+
+                  return data;
+              }
+
+              const mainButton = window.Telegram.WebApp.MainButton;
+              mainButton.text = "Получить отчет";
+              mainButton.enable();
+              mainButton.show();
+              mainButton.onClick(function () {
+                  window.Telegram.WebApp.sendData(JSON.stringify(collectData()));
+              });
+          });
+      </script>
+  </head>
+
+  <body>
+<form class="form">
+    <div class="report-buttons">
+        <label class="report-input-label">
+            <input type="radio" name="report" value="month" class="radio-input" checked />
+            <span>Отчет по месяцу</span>
+        </label>
+        <label class="report-input-label">
+            <input type="radio" name="report" value="category" class="radio-input" />
+            <span>Отчет по категории</span>
+        </label>
+    </div>
+
+    <div class="custom-select month-select">
+        <div class="field-wrapper">
+            <span class="label">Месяц</span>
+            <button class="select-button" type="button">Месяц</button>
+        </div>
+        <ul id="custom-dropdown" class="select-options"></ul>
+    </div>
+
+      <div class="custom-select category-select">
+          <div class="field-wrapper">
+              <span class="label">Категория</span>
+              <button class="select-button" type="button">Категория</button>
+          </div>
+          <ul id="category-dropdown" class="select-options"></ul>
+      </div>
+
+    <label class="hidden-input-label" for="select-value">
+      <input id="select-value" class="hidden-input" type="text" name="select-category" value=""/>
+    </label>
+
+      <div class="field-wrapper">
+          <span class="label">Год</span>
+
+          <label class="radio-input-label">
+              <input type="radio" name="year" value="2024" class="radio-input" checked/>
+              <span class="radio-input-text">2024</span>
+          </label>
+          <label class="radio-input-label">
+              <input type="radio" name="year" value="2023" class="radio-input"/>
+              <span class="radio-input-text">2023</span>
+          </label>
+          <label class="radio-input-label">
+              <input type="radio" name="year" value="2022" class="radio-input"/>
+              <span class="radio-input-text">2022</span>
+          </label>
+      </div>
+  </form>
+  </body>
+</html>
