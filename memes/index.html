@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Fun Facts about Cats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+<head>
+
+<body>
+  <div class="container">
+    <h1>Fun Facts about Cats</h1>
+
+    <div class="facts"></div>
+
+    <div class="loader">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+  <script>
+    let currentPage = 1;
+    const limit = 25;
+    let total = 0;
+    const factsEl = document.querySelector('.facts');
+    const loader = document.querySelector('.loader');
+    const getfacts = async (page, limit) => {
+      const API_URL = `https://catfact.ninja/facts?page=${page}&limit=${limit}`;
+      const response = await fetch(API_URL);
+      // handle 404
+      if (!response.ok) {
+        throw new Error(`An error occurred: ${response.status}`);
+      }
+      return await response.json();
+    }
+    const showfacts = (facts) => {
+      facts.forEach(fact => {
+        const factEl = document.createElement('blockfact');
+        factEl.classList.add('fact');
+        factEl.innerHTML = `${fact.fact}`;
+        factsEl.appendChild(factEl);
+      });
+    };
+    const hideLoader = () => {
+      loader.classList.remove('show');
+    };
+
+    const showLoader = () => {
+      loader.classList.add('show');
+    };
+    const hasMorefacts = (page, limit, total) => {
+      const startIndex = (page - 1) * limit + 1;
+      return total === 0 || startIndex < total;
+    };
+
+    const loadfacts = async (page, limit) => {
+      console.log("loadfacts")
+      showLoader();
+      try {
+        if (hasMorefacts(page, limit, total)) {
+          const response = await getfacts(page, limit);
+          showfacts(response.data);
+          total = response.total;
+        }
+      } catch (error) {
+        console.log(error.message);
+      } finally {
+        hideLoader();
+      }
+    };
+    window.addEventListener('scroll', () => {
+      console.log("scroll")
+      const {
+        scrollTop,
+        scrollHeight,
+        clientHeight
+      } = document.documentElement;
+
+      if (scrollTop + clientHeight >= scrollHeight - 5 &&
+        hasMorefacts(currentPage, limit, total)) {
+        currentPage++;
+        loadfacts(currentPage, limit);
+      }
+    }, {
+      passive: true
+    });
+    loadfacts(currentPage, limit);
+
+    console.log("...");
+</script>
+</body>
+
+</html>
